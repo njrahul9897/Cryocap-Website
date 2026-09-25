@@ -1,26 +1,159 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: #ffffff;
+  --color-ink: #070707;
+  --color-muted: #707070;
+  --color-surface: #f8f8f8;
+  --color-accent: #f26522;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --spacing-gutter: clamp(1.25rem, 2.6vw, 3.125rem);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  color-scheme: light;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Figma "Grid Layer": 100px cells in the 1920x1080 frame, lines fading in toward the bottom */
+.grid-lines {
+  --cell: 5.208vw;
+  background-image:
+    linear-gradient(to right, #000 1px, transparent 1px),
+    linear-gradient(to bottom, #000 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+  background-position: 3.073vw 8.24svh;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.016) 35%,
+    rgba(0, 0, 0, 0.035) 68%,
+    rgba(0, 0, 0, 0.082) 100%
+  );
+}
+
+/* "Scroll Down" chevrons. The asset is a strip of arrows at a fixed pitch, so the flow is
+   built by tiling it and shifting by exactly one tile — that lands on an identical frame,
+   giving a loop with no seam and no empty beat between arrows.
+   The window is rotated 180deg (the asset points up), which also means the strip's local
+   -Y reads as down on screen, so -50% travels the arrows the way they point. */
+.chevron-window {
+  rotate: 180deg;
+  overflow: hidden;
+  /* arrows ease in and out at the edges of the window instead of fading on a timer, so the
+     stream stays unbroken; same 35%/65% envelope the old per-arrow fade used */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
+}
+
+@keyframes chevron-flow {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
   }
 }
 
+/* must stay linear: any easing would stall the stream at the loop point */
+.chevron-flow {
+  animation: chevron-flow 1.6s linear infinite;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* Figma "Grid Layer": 100px cells in the 1920x1080 frame, lines fading in toward the bottom */
+.grid-lines {
+  --cell: 5.208vw;
+  background-image:
+    linear-gradient(to right, #000 1px, transparent 1px),
+    linear-gradient(to bottom, #000 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+  background-position: 3.073vw 8.24svh;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.016) 35%,
+    rgba(0, 0, 0, 0.035) 68%,
+    rgba(0, 0, 0, 0.082) 100%
+  );
+}
+
+/* "Scroll Down" chevrons. The asset is a strip of arrows at a fixed pitch, so the flow is
+   built by tiling it and shifting by exactly one tile — that lands on an identical frame,
+   giving a loop with no seam and no empty beat between arrows.
+   The window is rotated 180deg (the asset points up), which also means the strip's local
+   -Y reads as down on screen, so -50% travels the arrows the way they point. */
+.chevron-window {
+  rotate: 180deg;
+  overflow: hidden;
+  /* arrows ease in and out at the edges of the window instead of fading on a timer, so the
+     stream stays unbroken; same 35%/65% envelope the old per-arrow fade used */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
+}
+
+@keyframes chevron-flow {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* must stay linear: any easing would stall the stream at the loop point */
+.chevron-flow {
+  animation: chevron-flow 1.6s linear infinite;
+}
+
+@keyframes chevron-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.chevron-pulse {
+  animation: chevron-pulse 1.2s ease-in-out infinite;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
 }

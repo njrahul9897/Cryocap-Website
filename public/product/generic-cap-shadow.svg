@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="189.631" height="64.0099" viewBox="0 0 189.631 64.0099" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Green Cap Shadow" filter="url(#filter0_f_0_5)">
+<path d="M55.6923 27.4077C0.710359 13.5868 2.2375 7.37721 9.87382 6C62.2018 18.6446 169.411 45.5864 179.627 52.1962C189.842 58.8061 178.124 58.4556 170.989 57.4541C159.793 54.3839 102.261 40.2843 98.881 39.4272C95.501 38.5701 71.018 31.2602 55.6923 27.4077Z" fill="black" fill-opacity="0.8"/>
+</g>
+<defs>
+<filter id="filter0_f_0_5" x="5.57957e-08" y="0" width="189.631" height="64.0099" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="3" result="effect1_foregroundBlur_0_5"/>
+</filter>
+</defs>
+</svg>

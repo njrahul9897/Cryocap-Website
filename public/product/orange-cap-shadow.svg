@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="231.946" height="76.3995" viewBox="0 0 231.946 76.3995" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Orange Cap Shadow" filter="url(#filter0_f_0_4)">
+<path d="M67.5298 32.5074C-0.549718 15.3942 1.34121 7.70528 10.7966 6C75.5899 21.6568 208.339 55.0165 220.987 63.2009C233.636 71.3854 219.127 70.9514 210.292 69.7113C196.429 65.9097 125.192 48.4513 121.007 47.39C116.822 46.3288 86.5064 37.2776 67.5298 32.5074Z" fill="black" fill-opacity="0.8"/>
+</g>
+<defs>
+<filter id="filter0_f_0_4" x="3.11477e-08" y="0" width="231.946" height="76.3995" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="3" result="effect1_foregroundBlur_0_4"/>
+</filter>
+</defs>
+</svg>
