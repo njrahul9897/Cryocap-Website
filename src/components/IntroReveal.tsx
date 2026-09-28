@@ -68,7 +68,14 @@ export default function IntroReveal() {
       const rise = pick("rise");
       gsap.set(chrome, { autoAlpha: 0 });
       gsap.set(fade, { autoAlpha: 0, y: T.heroFade.fromY * window.innerHeight });
+      // xPercent, NOT the markup's `lg:-translate-x-1/2`. Tailwind v4 emits that as the
+      // standalone `translate` property, and the moment GSAP takes over this element's
+      // transform it sets `translate: none` — so the -50% was being thrown away and the can
+      // came to rest half its own width RIGHT of where `left-[50.42%]` is meant to centre it.
+      // Below lg the product sits in normal flow and is centred by its parent, so no offset.
+      const riseCentered = window.innerWidth >= 1024 ? -50 : 0;
       gsap.set(rise, {
+        xPercent: riseCentered,
         yPercent: 115,
         x: T.productRise.fromX * window.innerWidth,
         rotation: T.productRise.fromRotation,

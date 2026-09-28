@@ -87,7 +87,7 @@ export default function Hero() {
         <Callout side="left" pair="b" icon="/icons/bell.svg" title="You Don’t Realize In-time" description="By the time the drop is significant enough to catch attention, a considerable amount has already escaped" />
         <Callout side="right" pair="b" icon="/icons/caution.svg" title="Semen Quality Get Affected" description="This can damage sperm membrane integrity, reduce motility, and lower overall fertility potential" />
 
-        <Product data-intro="rise" className="z-30 mt-3 h-[40svh] lg:absolute lg:top-[17.47svh] lg:left-[50.42%] lg:mt-0 lg:h-[min(60.27svh,52vw)] lg:-translate-x-1/2" />
+        <Product data-intro="rise" className="z-30 mt-3 h-[40svh] lg:absolute lg:top-[17.47svh] lg:left-[50.42%] lg:mt-0 lg:h-[min(60.27svh,33.9vw)]" />
 
         <div data-intro="chrome" data-stage="copy-bottom" className="relative z-20 mt-6 flex flex-col items-center gap-6 lg:absolute lg:left-1/2 lg:top-[82.7svh] lg:mt-0 lg:-translate-x-1/2 lg:gap-9">
           <p className="text-center text-base text-muted lg:whitespace-nowrap lg:text-[clamp(1rem,1.04vw,1.25rem)]">

@@ -20,11 +20,14 @@ const CAP_PARK_CLEARANCE_VH = 0.02;
 
 // Row clip-window height in phase 1 is the literal `h-[13.46vw]` class on each row.
 const BIG_ROW_VW = 0.1346;
-// Figma's small "How does"/"it works" images are both 11.2% of the frame's height — this ratio
-// is kept for how much the headline shrinks by; the ROW/GRID gaps below replace Figma's literal
-// (near-top, bottom-anchored-grid) placement with the whole block centred on the viewport, per
-// explicit direction: Figma's own layout read as bottom-heavy and its row spacing as too loose.
-const SMALL_ROW_VH = 0.112;
+// How much the headline shrinks by. Figma's small "How does"/"it works" rows are 11.2% of the
+// 1080-tall frame against a big row that is 13.46% of its 1920 width, so the shrink is that
+// pair's ratio — a CONSTANT, not something to recompute per viewport. Deriving it live from
+// `vh/vw` made the shrunk headline drift with aspect ratio (0.447 at 1512x812 but 0.521 at
+// 1920x1200), which is the same vh-vs-vw mismatch that oversized the hero can.
+// The ROW/GRID gaps below replace Figma's literal (near-top, bottom-anchored-grid) placement
+// with the whole block centred on the viewport, per explicit direction.
+const TEXT_SHRINK = (0.112 * 1080) / (BIG_ROW_VW * 1920);
 // Gap between the two shrunk headline rows' visual edges, and between "It works" and the grid
 // below it — both as a fraction of viewport height, so they scale with the viewport like
 // everything else in this section.
@@ -64,16 +67,25 @@ export default function HowItWorksScroll() {
     // point left ~92px of the cap permanently visible at the bottom edge before it set off.
     const capParkY = vh / 2 + (cap.offsetHeight * CAP_PARKED.scale) / 2 + CAP_PARK_CLEARANCE_VH * vh;
 
-    gsap.set(cap, { y: capParkY, scale: CAP_PARKED.scale, rotation: CAP_PARKED.rotation });
+    // xPercent/yPercent, NOT `-translate-x-1/2 -translate-y-1/2` in the markup. Tailwind v4
+    // emits those as the standalone `translate` property, and GSAP discards that property on
+    // any axis it animates itself — so setting `y` here silently threw the -50% away and the
+    // cap came to rest half its own height BELOW centre. On a 1920x1080 viewport that was ~336px
+    // and easy to miss; on a taller one (1920x1200) it is 372px, far enough that the cap turns
+    // back before it ever looks centred. Owning the centring here keeps it on every axis.
+    gsap.set(cap, {
+      xPercent: -50,
+      yPercent: -50,
+      y: capParkY,
+      scale: CAP_PARKED.scale,
+      rotation: CAP_PARKED.rotation,
+    });
     gsap.set(gridItems, { y: 30, autoAlpha: 0 });
 
     // Both rows currently sit stacked and centered as one block, so each row's own vertical
     // centre (before any transform) is exactly half a row-height off the section's centre.
-    // The target height is vh-based (Figma) against a vw-based source size, so on a tall/narrow
-    // (portrait) viewport that ratio flips past 1 — an "enlarge" instead of the intended shrink.
-    // This is meant to only ever shrink the headline, so clamp at 1.
     const bigRowPx = BIG_ROW_VW * vw;
-    const textScale = Math.min(1, (SMALL_ROW_VH * vh) / bigRowPx);
+    const textScale = TEXT_SHRINK;
     const smallRowPx = bigRowPx * textScale;
 
     // Treat the shrunk headline (both rows) plus the four-step grid as ONE block and centre that

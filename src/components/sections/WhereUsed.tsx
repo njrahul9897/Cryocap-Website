@@ -64,7 +64,7 @@ export default function WhereUsed() {
           layer of the stack: in front of the faded words, behind the solid "used?" above. It
           rises from below the fold, then retreats back down the same path once the headline
           collapses — it never fades, matching the cap in the how-it-works section. */}
-      <div data-whereused-figure className="pointer-events-none absolute top-[52.27vh] left-1/2 z-10 h-[71.39svh]">
+      <div data-whereused-figure className="pointer-events-none absolute top-[52.27vh] left-1/2 z-10 h-[min(71.39svh,40.2vw)]">
         <div className="relative h-full aspect-[444/771]">
           <Image
             src="/where-used/bottle.webp"
