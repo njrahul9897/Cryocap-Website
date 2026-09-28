@@ -26,7 +26,7 @@ const T = {
   // can rises from below, drifting right and settling into its 15deg tilt
   productRise: { at: 10.3, dur: 1.5, fromX: -0.044, fromRotation: -10 },
   // once the can lands: the blurring white fade rises over the wordmark's lower half, grid slides up
-  settle: { at: 11.6, fadeFromTop: "85.3svh", fadeToTop: "37.1svh", fadeDur: 0.6, gridDur: 0.9 },
+  settle: { at: 11.6, fadeFromTop: "85.3dvh", fadeToTopDesktop: "37.1dvh", fadeToTopMobile: "42dvh", fadeDur: 0.6, gridDur: 0.9 },
 };
 
 function shouldSkip() {
@@ -68,14 +68,13 @@ export default function IntroReveal() {
       const rise = pick("rise");
       gsap.set(chrome, { autoAlpha: 0 });
       gsap.set(fade, { autoAlpha: 0, y: T.heroFade.fromY * window.innerHeight });
-      // xPercent, NOT the markup's `lg:-translate-x-1/2`. Tailwind v4 emits that as the
-      // standalone `translate` property, and the moment GSAP takes over this element's
-      // transform it sets `translate: none` — so the -50% was being thrown away and the can
-      // came to rest half its own width RIGHT of where `left-[50.42%]` is meant to centre it.
-      // Below lg the product sits in normal flow and is centred by its parent, so no offset.
-      const riseCentered = window.innerWidth >= 1024 ? -50 : 0;
+      // xPercent, NOT a `-translate-x-1/2` class. Tailwind v4 emits that as the standalone
+      // `translate` property, and the moment GSAP takes over this element's transform it sets
+      // `translate: none` — so the -50% was being thrown away and the can came to rest half its
+      // own width RIGHT of where `left-[50.42%]` is meant to centre it. The product is now
+      // absolutely centred at every breakpoint, so this applies unconditionally.
       gsap.set(rise, {
-        xPercent: riseCentered,
+        xPercent: -50,
         yPercent: 115,
         x: T.productRise.fromX * window.innerWidth,
         rotation: T.productRise.fromRotation,
@@ -84,6 +83,10 @@ export default function IntroReveal() {
 
       const whiteFade = document.querySelector<HTMLElement>("[data-hero='white-fade']");
       const grid = document.querySelector<HTMLElement>("[data-hero='grid']");
+      // The frost rests at a different height on each breakpoint, because the wordmark it
+      // fades does. Tweening `top` writes an inline value that outranks the responsive class,
+      // so the target has to be picked here rather than left to CSS.
+      const fadeToTop = window.innerWidth >= 1024 ? T.settle.fadeToTopDesktop : T.settle.fadeToTopMobile;
       if (whiteFade) gsap.set(whiteFade, { top: T.settle.fadeFromTop });
       if (grid) gsap.set(grid, { yPercent: 100 });
 
@@ -127,7 +130,7 @@ export default function IntroReveal() {
       tl.to(rise, { yPercent: 0, x: 0, rotation: 0, duration: T.productRise.dur, ease: "sine.out" }, T.productRise.at);
       tl.to(rise, { autoAlpha: 1, duration: 0.3, ease: "none" }, T.productRise.at);
 
-      if (whiteFade) tl.to(whiteFade, { top: T.settle.fadeToTop, duration: T.settle.fadeDur, ease: "power2.inOut" }, T.settle.at);
+      if (whiteFade) tl.to(whiteFade, { top: fadeToTop, duration: T.settle.fadeDur, ease: "power2.inOut" }, T.settle.at);
       if (grid) tl.to(grid, { yPercent: 0, duration: T.settle.gridDur, ease: "power2.out" }, T.settle.at);
 
       return () => {
@@ -139,12 +142,12 @@ export default function IntroReveal() {
   );
 
   const word =
-    "absolute inset-0 flex items-center justify-center text-[clamp(2rem,min(8.5svh,11vw),5.75rem)] font-semibold leading-none whitespace-nowrap";
+    "absolute inset-0 flex items-center justify-center text-[clamp(2rem,min(8.5dvh,11vw),5.75rem)] font-semibold leading-none whitespace-nowrap";
 
   return (
     <>
       <div ref={root} id="intro" className="pointer-events-none fixed inset-0 z-[100]" aria-hidden="true">
-        <div data-window className="absolute inset-x-0 top-1/2 h-[20.4svh] -translate-y-1/2 overflow-hidden">
+        <div data-window className="absolute inset-x-0 top-1/2 h-[20.4dvh] -translate-y-1/2 overflow-hidden">
           <div data-phrase className={word}>
             <Letters text="World’s First" />
           </div>

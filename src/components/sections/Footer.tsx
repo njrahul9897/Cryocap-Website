@@ -15,7 +15,7 @@ const BLUR_MAX_VW = 34 / 19.2;
 // can behind it — can be white while the rest stays black at 50%. Keeping that split verbatim
 // is more predictable than reproducing it with a blend mode, but it only lines up if the can
 // and the text scale together, which is why the can below is sized in vw (like this text)
-// rather than in svh.
+// rather than in dvh.
 const madeInIndia = [
   [
     { text: "ma", tone: "text-[#808080]" },
@@ -31,16 +31,16 @@ const madeInIndia = [
 
 export default function Footer() {
   return (
-    <footer data-footer className="relative h-svh overflow-hidden bg-white">
+    <footer data-footer className="relative h-dvh overflow-hidden bg-white">
       {/* Giant ghost wordmark — same size and gradient as the hero's, parked lower (Figma puts
           its frame at y=277 on the 1080 frame). */}
       <div
         data-footer-mark
-        className="pointer-events-none absolute inset-x-0 top-[25.65svh] z-0 hidden justify-center lg:flex"
+        className="pointer-events-none absolute inset-x-0 top-[25.65dvh] z-0 hidden justify-center lg:flex"
       >
-        <p className="relative bg-linear-to-b from-ink from-52% to-[#666] to-80% bg-clip-text text-[min(21.35vw,37.96svh)] font-extrabold leading-[1.26] whitespace-nowrap text-transparent">
+        <p className="relative bg-linear-to-b from-ink from-52% to-[#666] to-80% bg-clip-text text-[min(21.35vw,37.96dvh)] font-extrabold leading-[1.26] whitespace-nowrap text-transparent">
           Cryocap
-          <span className="absolute top-[2.3em] -right-[0.3em] text-[max(0.875rem,min(2.35vw,4.18svh))] font-semibold leading-none text-ink">
+          <span className="absolute top-[2.3em] -right-[0.3em] text-[max(0.875rem,min(2.35vw,4.18dvh))] font-semibold leading-none text-ink">
             TM
           </span>
         </p>
@@ -48,10 +48,10 @@ export default function Footer() {
 
       {/* The hero's progressive blur/fade, reused verbatim: backdrop blur ramping 0 -> 34px
           (1920 frame) down the wordmark's lower half, then a white gradient over the top.
-          The hero starts this 21.5svh below its wordmark (37.1 - 15.6); this wordmark sits
-          10svh lower, so these start 10svh lower too. Reusing the hero's own 37.1/55.7 offsets
+          The hero starts this 21.5dvh below its wordmark (37.1 - 15.6); this wordmark sits
+          10dvh lower, so these start 10dvh lower too. Reusing the hero's own 37.1/55.7 offsets
           here instead bit into far more of the wordmark and washed it out almost completely. */}
-      <div className="pointer-events-none absolute inset-x-0 top-[47.15svh] z-10 hidden h-[44.3svh] lg:block">
+      <div className="pointer-events-none absolute inset-x-0 top-[47.15dvh] z-10 hidden h-[44.3dvh] lg:block">
         {Array.from({ length: BLUR_STEPS }).map((_, i) => {
           const band = 100 / BLUR_STEPS;
           const blur = (BLUR_MAX_VW * (i + 1)) / BLUR_STEPS;
@@ -66,14 +66,14 @@ export default function Footer() {
         })}
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_0%,rgba(255,255,255,0.6)_20%,rgba(255,255,255,0.88)_40%,#fff_68%)]" />
       </div>
-      <div className="pointer-events-none absolute inset-x-0 top-[65.75svh] z-10 hidden h-[44.3svh] bg-linear-to-b from-white/0 to-surface to-68% lg:block" />
+      <div className="pointer-events-none absolute inset-x-0 top-[65.75dvh] z-10 hidden h-[44.3dvh] bg-linear-to-b from-white/0 to-surface to-68% lg:block" />
 
       {/* The can & cap. Width, not height, is the fixed dimension (Figma 409/1920 = 21.3vw): the
           "made in india" runs below are split at letter boundaries that only line up with the
           can's edges if the two scale off the same axis. */}
       <div
         data-footer-can
-        className="pointer-events-none absolute top-[57.5svh] left-[49.45vw] z-20 w-[21.3vw] -translate-x-1/2"
+        className="pointer-events-none absolute top-[57.5dvh] left-[49.45vw] z-20 w-[21.3vw] -translate-x-1/2"
       >
         <div className="relative w-full aspect-[409/844]">
           <Image
@@ -89,7 +89,7 @@ export default function Footer() {
       {/* Sign-off and the same CTA pair the hero carries. */}
       <div
         data-footer-copy
-        className="absolute inset-x-0 top-[12.59svh] z-30 flex flex-col items-center gap-[2.604vw] px-gutter"
+        className="absolute inset-x-0 top-[12.59dvh] z-30 flex flex-col items-center gap-[2.604vw] px-gutter"
       >
         <p className="w-[47.45vw] text-center text-[2.604vw] leading-normal text-ink max-lg:w-full max-lg:text-[5vw]">
           Smart <strong className="font-extrabold">Monitoring</strong>, Better{" "}
@@ -146,7 +146,7 @@ export default function Footer() {
       {/* Figma swaps the global bar's "Scroll Down" cluster for the copyright down here. */}
       <div
         data-footer-copy
-        className="absolute right-gutter bottom-[2.96svh] z-40 text-[clamp(12px,0.833vw,16px)] leading-none text-ink"
+        className="absolute right-gutter bottom-[2.96dvh] z-40 text-[clamp(12px,0.833vw,16px)] leading-none text-ink"
       >
         © 2026 Cryocap
       </div>

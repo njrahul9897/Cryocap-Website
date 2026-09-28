@@ -17,7 +17,7 @@ export default function Callout({ side, pair, icon, title, description }: Props)
       data-callout={pair}
       data-side={side}
       className={`absolute z-20 aspect-[706/229] w-[min(90vw,36.77vw)] max-lg:w-[88vw] ${
-        right ? "lg:top-[63.8svh] lg:left-[58.54vw] max-lg:top-[69svh] max-lg:right-[6vw]" : "lg:top-[15.46svh] lg:left-[4.69vw] max-lg:top-[13svh] max-lg:left-[6vw]"
+        right ? "lg:top-[63.8dvh] lg:left-[58.54vw] max-lg:top-[69dvh] max-lg:right-[6vw]" : "lg:top-[15.46dvh] lg:left-[4.69vw] max-lg:top-[13dvh] max-lg:left-[6vw]"
       }`}
     >
       <div
