@@ -26,7 +26,13 @@ const T = {
   // can rises from below, drifting right and settling into its 15deg tilt
   productRise: { at: 10.3, dur: 1.5, fromX: -0.044, fromRotation: -10 },
   // once the can lands: the blurring white fade rises over the wordmark's lower half, grid slides up
-  settle: { at: 11.6, fadeFromTop: "85.3dvh", fadeToTopDesktop: "37.1dvh", fadeToTopMobile: "42dvh", fadeDur: 0.6, gridDur: 0.9 },
+  // The frost slides up into its resting place. That rest position is a responsive CSS
+  // class, so this animates a TRANSFORM offset down from it rather than tweening `top`:
+  // `top` is a layout property, and this element carries a stack of backdrop-filter
+  // layers, so moving it that way re-rasterised every blur band on every frame — which is
+  // a large part of why the intro stuttered on a phone. Offsets are how far below its
+  // rest position it starts (Figma has it entering from 85.3dvh).
+  settle: { at: 11.6, fadeFromDesktop: 0.853 - 0.371, fadeFromMobile: 0.853 - 0.42, fadeDur: 0.6, gridDur: 0.9 },
 };
 
 function shouldSkip() {
@@ -83,11 +89,11 @@ export default function IntroReveal() {
 
       const whiteFade = document.querySelector<HTMLElement>("[data-hero='white-fade']");
       const grid = document.querySelector<HTMLElement>("[data-hero='grid']");
-      // The frost rests at a different height on each breakpoint, because the wordmark it
-      // fades does. Tweening `top` writes an inline value that outranks the responsive class,
-      // so the target has to be picked here rather than left to CSS.
-      const fadeToTop = window.innerWidth >= 1024 ? T.settle.fadeToTopDesktop : T.settle.fadeToTopMobile;
-      if (whiteFade) gsap.set(whiteFade, { top: T.settle.fadeFromTop });
+      // The frost rests at a different height on each breakpoint, because the wordmark it fades
+      // does. Leaving `top` to the responsive class and animating only the offset keeps that
+      // difference in CSS where it belongs.
+      const fadeFrom = window.innerWidth >= 1024 ? T.settle.fadeFromDesktop : T.settle.fadeFromMobile;
+      if (whiteFade) gsap.set(whiteFade, { y: fadeFrom * window.innerHeight });
       if (grid) gsap.set(grid, { yPercent: 100 });
 
       const phrases = Array.from(el.querySelectorAll<HTMLElement>("[data-phrase]"));
@@ -130,7 +136,7 @@ export default function IntroReveal() {
       tl.to(rise, { yPercent: 0, x: 0, rotation: 0, duration: T.productRise.dur, ease: "sine.out" }, T.productRise.at);
       tl.to(rise, { autoAlpha: 1, duration: 0.3, ease: "none" }, T.productRise.at);
 
-      if (whiteFade) tl.to(whiteFade, { top: fadeToTop, duration: T.settle.fadeDur, ease: "power2.inOut" }, T.settle.at);
+      if (whiteFade) tl.to(whiteFade, { y: 0, duration: T.settle.fadeDur, ease: "power2.inOut" }, T.settle.at);
       if (grid) tl.to(grid, { yPercent: 0, duration: T.settle.gridDur, ease: "power2.out" }, T.settle.at);
 
       return () => {

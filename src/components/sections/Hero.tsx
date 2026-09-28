@@ -4,8 +4,30 @@ import Callout from "@/components/Callout";
 import StageScroll from "@/components/StageScroll";
 import Solutions from "@/components/sections/Solutions";
 
-const BLUR_STEPS = 8;
+// Progressive backdrop blur, 0 at the overlay's top edge to 34px (on the 1920 frame) at its
+// bottom. Each band is a full-screen backdrop-filter layer, and the hero is pinned — so the
+// content behind them moves and every band re-rasterises on every frame. Eight of those is
+// fine on a desktop GPU and is a major source of stutter on a phone, so mobile gets a coarser
+// ramp. The bands are rendered as two sets rather than one responsive count because this is a
+// server component with no viewport to branch on.
 const BLUR_MAX_VW = 34 / 19.2;
+const BLUR_STEPS_DESKTOP = 8;
+const BLUR_STEPS_MOBILE = 3;
+
+function BlurRamp({ steps }: { steps: number }) {
+  return Array.from({ length: steps }).map((_, i) => {
+    const band = 100 / steps;
+    const blur = (BLUR_MAX_VW * (i + 1)) / steps;
+    const mask = `linear-gradient(to bottom, transparent ${i * band}%, black ${(i + 1) * band}%, black ${(i + 2) * band}%, transparent ${(i + 3) * band}%)`;
+    return (
+      <div
+        key={i}
+        className="absolute inset-0"
+        style={{ backdropFilter: `blur(${blur}vw)`, WebkitBackdropFilter: `blur(${blur}vw)`, maskImage: mask, WebkitMaskImage: mask }}
+      />
+    );
+  });
+}
 
 const sweep =
   "pointer-events-none absolute top-1/2 left-full z-20 -translate-y-1/2 text-[17.1vw] font-extrabold leading-none whitespace-nowrap will-change-transform";
@@ -42,18 +64,12 @@ export default function Hero() {
 
           {/* Frame-3 blur/fade overlay: progressive backdrop blur, 0 at its top edge to 34px (1920 frame) at its bottom. */}
           <div data-hero="white-fade" className="pointer-events-none absolute inset-x-0 top-[42dvh] z-10 h-[30dvh] lg:top-[37.1dvh] lg:h-[44.3dvh]">
-            {Array.from({ length: BLUR_STEPS }).map((_, i) => {
-              const band = 100 / BLUR_STEPS;
-              const blur = (BLUR_MAX_VW * (i + 1)) / BLUR_STEPS;
-              const mask = `linear-gradient(to bottom, transparent ${i * band}%, black ${(i + 1) * band}%, black ${(i + 2) * band}%, transparent ${(i + 3) * band}%)`;
-              return (
-                <div
-                  key={i}
-                  className="absolute inset-0"
-                  style={{ backdropFilter: `blur(${blur}vw)`, WebkitBackdropFilter: `blur(${blur}vw)`, maskImage: mask, WebkitMaskImage: mask }}
-                />
-              );
-            })}
+            <div className="contents lg:hidden">
+              <BlurRamp steps={BLUR_STEPS_MOBILE} />
+            </div>
+            <div className="hidden lg:contents">
+              <BlurRamp steps={BLUR_STEPS_DESKTOP} />
+            </div>
             <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_0%,rgba(255,255,255,0.6)_20%,rgba(255,255,255,0.88)_40%,#fff_68%)]" />
           </div>
         </div>
