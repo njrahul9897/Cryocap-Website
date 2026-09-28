@@ -123,13 +123,22 @@ export default function StageScroll() {
         },
       });
 
+      // On mobile the hero parks the can above centre, to tighten the space under the tagline.
+      // From the moment the cap leaves onward it should sit centred instead. Measure how far
+      // above centre it actually rests rather than repeating the hero's offset here, where it
+      // would silently drift the next time that value is tuned. `offsetTop` is used, not a
+      // viewport rect, so this is independent of where the page happens to be scrolled.
+      // Desktop deliberately does NOT centre it — that composition comes straight from Figma.
+      const productCentre = product.offsetTop + product.offsetHeight / 2;
+      const heroLift = desktop ? 0 : vh / 2 - productCentre;
+
       // 1. hero copy scrolls away, cap lifts out along the can axis (collar branding goes with it), then the can straightens.
       // The can is tilted 15deg, so the cap pulls out along that same axis — up AND to the right — not straight up.
       // (Figma frames 2 -> 4 move the cap by +286x / -1020y, i.e. ~15deg off vertical.)
       tl.to(copy, { y: -copyTravel, duration: 1.0 }, 0);
       tl.to(cap, { x: capLift * axisX, y: -capLift, duration: 1.0 }, 0.1);
       tl.to(canPlain, { autoAlpha: 1, duration: 0.4 }, 0.3);
-      tl.to(product, { rotation: -15, scale: desktop ? 1 : 0.95, duration: 0.8 }, 1.0);
+      tl.to(product, { rotation: -15, scale: desktop ? 1 : 0.95, y: heroLift, duration: 0.8 }, 1.0);
 
       // 2. generic cap drops in. The wrapper is counter-rotated to -15deg here (can upright),
       // so unwinding the tilted offset reads as a straight drop onto the neck.
@@ -177,7 +186,9 @@ export default function StageScroll() {
           rotation: -15,
           scale: desktop ? 1.1687 : 0.9,
           x: desktop ? -0.256 * vw : 0,
-          y: desktop ? 0.0307 * vh : -0.08 * vh,
+          // relative to the centred position the can took at step 1, so it keeps the same
+          // net placement the solutions beat was tuned to before the hero moved up
+          y: (desktop ? 0.0307 * vh : -0.08 * vh) + heroLift,
           duration: 1.0,
         },
         11.8,
