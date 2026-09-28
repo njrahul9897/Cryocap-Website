@@ -55,8 +55,9 @@ export default function FooterScroll() {
     // are wrong on the last screen — there is nothing below to scroll to, and the footer shows
     // its own badge up top — so fade that cluster out as the footer arrives. Nothing else about
     // the shared chrome changes, and it fades back in on the way out.
-    const barEnd = document.querySelector<HTMLElement>("[data-bottombar-end]");
-    if (barEnd) arrive.to(barEnd, { autoAlpha: 0, duration: 0.3 }, 0.2);
+    // Two of these now: the phone's centred arrow and the wider "Scroll Down" + badge group.
+    const barEnd = Array.from(document.querySelectorAll<HTMLElement>("[data-bottombar-end]"));
+    if (barEnd.length) arrive.to(barEnd, { autoAlpha: 0, duration: 0.3 }, 0.2);
 
     // 2 — the sign-off. The block starts one line-height LOWER than it rests, so its first line
     // occupies the bottom slot: "made in india" reveals there, then the block rides up by that

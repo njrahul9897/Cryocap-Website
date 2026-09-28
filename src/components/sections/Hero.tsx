@@ -47,7 +47,7 @@ export default function Hero() {
             data-intro="fade"
             // the wordmark size lives on the h1, not the span, so the TM can be expressed
             // as a fraction of it (see below)
-            className="absolute left-1/2 top-[36dvh] z-0 -translate-x-1/2 text-[max(3.5rem,min(19vw,37.96dvh))] lg:top-[15.6dvh] lg:text-[min(21.35vw,37.96dvh)]"
+            className="absolute left-1/2 top-[30dvh] z-0 -translate-x-1/2 text-[max(3.5rem,min(19vw,37.96dvh))] lg:top-[15.6dvh] lg:text-[min(21.35vw,37.96dvh)]"
           >
             <span className="block bg-linear-to-b from-ink from-52% to-[#666] to-80% bg-clip-text text-[1em] font-extrabold leading-[1.26] whitespace-nowrap text-transparent">
               Cryocap
@@ -63,7 +63,7 @@ export default function Hero() {
           </h1>
 
           {/* Frame-3 blur/fade overlay: progressive backdrop blur, 0 at its top edge to 34px (1920 frame) at its bottom. */}
-          <div data-hero="white-fade" className="pointer-events-none absolute inset-x-0 top-[42dvh] z-10 h-[30dvh] lg:top-[37.1dvh] lg:h-[44.3dvh]">
+          <div data-hero="white-fade" className="pointer-events-none absolute inset-x-0 top-[36dvh] z-10 h-[30dvh] lg:top-[37.1dvh] lg:h-[44.3dvh]">
             <div className="contents lg:hidden">
               <BlurRamp steps={BLUR_STEPS_MOBILE} />
             </div>
@@ -74,7 +74,7 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 top-[55dvh] z-10 h-[45dvh] bg-linear-to-b from-white/0 to-surface to-68% lg:top-[55.7dvh] lg:h-[44.3dvh]" />
+        <div className="pointer-events-none absolute inset-x-0 top-[49dvh] z-10 h-[45dvh] bg-linear-to-b from-white/0 to-surface to-68% lg:top-[55.7dvh] lg:h-[44.3dvh]" />
 
         <div data-hero="grid" className="pointer-events-none absolute inset-0 z-10">
           <div className="grid-lines absolute inset-0" />
@@ -113,9 +113,9 @@ export default function Hero() {
         <Callout side="left" pair="b" icon="/icons/bell.svg" title="You Don’t Realize In-time" description="By the time the drop is significant enough to catch attention, a considerable amount has already escaped" />
         <Callout side="right" pair="b" icon="/icons/caution.svg" title="Semen Quality Get Affected" description="This can damage sperm membrane integrity, reduce motility, and lower overall fertility potential" />
 
-        <Product data-intro="rise" className="absolute left-1/2 top-[30dvh] z-30 h-[40dvh] lg:top-[17.47dvh] lg:left-[50.42%] lg:h-[min(60.27dvh,33.9vw)]" />
+        <Product data-intro="rise" className="absolute left-1/2 top-[24dvh] z-30 h-[40dvh] lg:top-[17.47dvh] lg:left-[50.42%] lg:h-[min(60.27dvh,33.9vw)]" />
 
-        <div data-intro="chrome" data-stage="copy-bottom" className="absolute left-1/2 top-[76dvh] z-20 flex w-[88vw] -translate-x-1/2 flex-col items-center gap-6 lg:top-[82.7dvh] lg:w-auto lg:gap-9">
+        <div data-intro="chrome" data-stage="copy-bottom" className="absolute left-1/2 top-[70dvh] z-20 flex w-[88vw] -translate-x-1/2 flex-col items-center gap-6 lg:top-[82.7dvh] lg:w-auto lg:gap-9">
           <p className="text-center text-base text-muted lg:whitespace-nowrap lg:text-[clamp(1rem,1.04vw,1.25rem)]">
             Smart Monitoring for Safer &amp; Better Livestock Breeding
           </p>

@@ -32,7 +32,7 @@ const T = {
   // layers, so moving it that way re-rasterised every blur band on every frame — which is
   // a large part of why the intro stuttered on a phone. Offsets are how far below its
   // rest position it starts (Figma has it entering from 85.3dvh).
-  settle: { at: 11.6, fadeFromDesktop: 0.853 - 0.371, fadeFromMobile: 0.853 - 0.42, fadeDur: 0.6, gridDur: 0.9 },
+  settle: { at: 11.6, fadeFromDesktop: 0.853 - 0.371, fadeFromMobile: 0.853 - 0.36, fadeDur: 0.6, gridDur: 0.9 },
 };
 
 function shouldSkip() {
