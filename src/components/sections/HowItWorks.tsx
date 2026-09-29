@@ -91,7 +91,7 @@ export default function HowItWorks() {
           came, leaving the frame before the steps below arrive; it never fades. */}
       <div
         data-howitworks-cap
-        className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-[62.05dvh] lg:h-[min(62.05dvh,34.9vw)]"
+        className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-[31dvh] lg:h-[min(62.05dvh,34.9vw)]"
       >
         <div className="relative h-full aspect-[478/1100]">
           <Image src="/product/cap-probe.png" alt="Cryocap smart cap and its probe" fill sizes="(min-width: 1024px) 16vw, 40vw" className="object-contain" />
@@ -113,7 +113,7 @@ export default function HowItWorks() {
         data-howitworks-grid
         // no `top`/`bottom` here — HowItWorksScroll sets `top` once it has measured this
         // grid's own height, so the headline + grid read as one centered block
-        className="pointer-events-none absolute inset-x-0 z-30 flex justify-center items-end gap-[3.5vw] px-gutter max-lg:flex-wrap max-lg:gap-y-10"
+        className="pointer-events-none absolute inset-x-0 z-30 flex justify-center items-end gap-[3.5vw] px-gutter max-lg:flex-wrap max-lg:gap-y-6"
       >
         {steps.map((step, i) => (
           <div
@@ -123,7 +123,7 @@ export default function HowItWorks() {
             // on first paint before HowItWorksScroll has parked them
             className="flex w-[15vw] flex-col items-center gap-[1.875vw] opacity-0 max-lg:w-[40vw]"
           >
-            <span className={`relative ${step.imgWidth} max-lg:w-[24vw]`} style={{ aspectRatio: step.ratio }}>
+            <span className={`relative ${step.imgWidth} max-lg:w-[22vw]`} style={{ aspectRatio: step.ratio }}>
               <Image src={step.src} alt={step.alt} fill unoptimized className="object-contain" />
             </span>
             <p className="text-center text-[clamp(12px,1.1vw,20px)] leading-snug text-muted">
