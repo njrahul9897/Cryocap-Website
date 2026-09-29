@@ -186,9 +186,10 @@ export default function StageScroll() {
           rotation: -15,
           scale: desktop ? 1.1687 : 0.9,
           x: desktop ? -0.256 * vw : 0,
-          // relative to the centred position the can took at step 1, so it keeps the same
-          // net placement the solutions beat was tuned to before the hero moved up
-          y: (desktop ? 0.0307 * vh : -0.08 * vh) + heroLift,
+          // Desktop slides it down a touch into the Figma solutions position. Mobile keeps it
+          // dead centre — where it has been since the cap came out — rather than riding up as
+          // the generic cap leaves; the cards scroll over it from there.
+          y: heroLift + (desktop ? 0.0307 * vh : 0),
           duration: 1.0,
         },
         11.8,
