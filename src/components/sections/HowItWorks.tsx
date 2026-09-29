@@ -91,7 +91,7 @@ export default function HowItWorks() {
           came, leaving the frame before the steps below arrive; it never fades. */}
       <div
         data-howitworks-cap
-        className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-[min(62.05dvh,34.9vw)]"
+        className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-[62.05dvh] lg:h-[min(62.05dvh,34.9vw)]"
       >
         <div className="relative h-full aspect-[478/1100]">
           <Image src="/product/cap-probe.png" alt="Cryocap smart cap and its probe" fill sizes="(min-width: 1024px) 16vw, 40vw" className="object-contain" />

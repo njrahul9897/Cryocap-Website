@@ -10,9 +10,12 @@ import WhereUsedScroll from "@/components/WhereUsedScroll";
 // RE-FLOW from three lines to one, so each word gets its own absolutely positioned centre and
 // is flown to its small-line position independently. Each also keeps its own clip window, so
 // the four still reveal one after another the way "How / does / It / works" does.
-const word = "text-[16.67vw] font-extrabold uppercase leading-[0.909] whitespace-nowrap";
+// 16.67vw is Figma's 320px on the 1920 frame. That same ratio on a phone is only ~7.7% of
+// the viewport HEIGHT (against 26.7% on desktop), which is what left the three rows
+// marooned in white space — so mobile gets a much larger share of the width.
+const word = "text-[24vw] lg:text-[16.67vw] font-extrabold uppercase leading-[0.909] whitespace-nowrap";
 // Clip-window height is font-size x leading, the same relationship the how-it-works rows use.
-const window_ = "h-[15.15vw] overflow-hidden";
+const window_ = "h-[21.8vw] lg:h-[15.15vw] overflow-hidden";
 
 // Phase-1 centres, as fractions of the frame, straight off Figma frame 16 (glyph-box centre =
 // node y + height/2). "Where" and "used?" sit dead centre horizontally; "is" and "it" straddle
@@ -21,14 +24,14 @@ type Word = { id: string; text: string; pos: string; tone: string; layer: string
 
 const words: Word[] = [
   // faded, and painted BEHIND the mascot — same role "How does" plays in the other section
-  { id: "where", text: "Where", pos: "left-[49.97vw] top-[21.99vh]", tone: "text-black/10", layer: "" },
-  { id: "is", text: "is", pos: "left-[30.05vw] top-[49.95vh]", tone: "text-black/10", layer: "" },
-  { id: "it", text: "it", pos: "left-[70.13vw] top-[49.95vh]", tone: "text-black/10", layer: "" },
+  { id: "where", text: "Where", pos: "left-[49.97vw] top-[37dvh] lg:top-[21.99vh]", tone: "text-black/10", layer: "" },
+  { id: "is", text: "is", pos: "left-[14vw] top-[50dvh] lg:left-[30.05vw] lg:top-[49.95vh]", tone: "text-black/10", layer: "" },
+  { id: "it", text: "it", pos: "left-[86vw] top-[50dvh] lg:left-[70.13vw] lg:top-[49.95vh]", tone: "text-black/10", layer: "" },
   // solid black and in FRONT of the mascot, the way "It works" rises over the cap. No
   // `relative` here: these boxes are already absolutely positioned, so z-index applies as-is,
   // and adding `relative` would emit a second `position` that wins and drops the word back
   // into normal flow at full viewport width.
-  { id: "used", text: "used?", pos: "left-[50vw] top-[78.10vh]", tone: "text-ink", layer: "z-20" },
+  { id: "used", text: "used?", pos: "left-[50vw] top-[63dvh] lg:top-[78.10vh]", tone: "text-ink", layer: "z-20" },
 ];
 
 // Figma "Image Slide": five 960x536 photos, 10px white border, 26px radius, 50px apart, each
@@ -64,7 +67,7 @@ export default function WhereUsed() {
           layer of the stack: in front of the faded words, behind the solid "used?" above. It
           rises from below the fold, then retreats back down the same path once the headline
           collapses — it never fades, matching the cap in the how-it-works section. */}
-      <div data-whereused-figure className="pointer-events-none absolute top-[52.27vh] left-1/2 z-10 h-[min(71.39dvh,40.2vw)]">
+      <div data-whereused-figure className="pointer-events-none absolute top-[50dvh] left-1/2 z-10 h-[52dvh] lg:top-[52.27vh] lg:h-[min(71.39dvh,40.2vw)]">
         <div className="relative h-full aspect-[444/771]">
           <Image
             src="/where-used/bottle.webp"
