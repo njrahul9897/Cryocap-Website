@@ -46,10 +46,14 @@ export default function Callout({ side, pair, icon, title, description }: Props)
         </h3>
       </div>
 
+      {/* Description runs the full callout width rather than Figma's 90.65% inset. At that
+          inset the longest of these ("Temperature Fluctuates") wrapped to three lines where
+          every sibling takes two; it needs 98% to fit two, so the inset was the thing breaking
+          it. `ml-auto` went with it — at full width there is nothing left to push over. */}
       <div className={`absolute top-[65.07%] -bottom-[60%] w-full overflow-hidden ${right ? "text-right" : ""}`}>
         <p
           data-callout-desc
-          className={`mt-[2.83%] opacity-0 text-[clamp(12px,1.25vw,24px)] leading-[1.26] text-muted ${right ? "ml-auto" : ""} w-[90.65%]`}
+          className={`mt-[2.83%] w-full opacity-0 text-[clamp(12px,1.25vw,24px)] leading-[1.26] text-muted`}
         >
           {description}
         </p>
