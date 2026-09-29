@@ -90,7 +90,7 @@ export default function Hero() {
         </div>
 
         {/* ghost labels */}
-        <div className="pointer-events-none absolute top-[83.5dvh] left-[6vw] z-10 h-[5.47vw] overflow-hidden lg:top-[75.3dvh] lg:left-[4.69vw]">
+        <div className="pointer-events-none absolute top-[68dvh] left-[6vw] z-10 h-[5.47vw] overflow-hidden lg:top-[75.3dvh] lg:left-[4.69vw]">
           <p data-stage="label-problems" className={`${ghost} text-[6.04vw] translate-y-full`}>
             problems
           </p>

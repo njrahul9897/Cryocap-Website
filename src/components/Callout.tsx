@@ -10,6 +10,9 @@ type Props = {
 
 // Figma "Left/Right Aligned" callout: 706 x 229 box; leader line at 26.2%, icon 46px at the
 // outer corner, title and description in clipped boxes so they can slide into view.
+// On mobile the pair is pushed further apart than Figma's desktop offsets — up top, down
+// below — to open up room between them and for the "problems" ghost word that sits above the
+// lower one.
 export default function Callout({ side, pair, icon, title, description }: Props) {
   const right = side === "right";
   return (
@@ -17,7 +20,7 @@ export default function Callout({ side, pair, icon, title, description }: Props)
       data-callout={pair}
       data-side={side}
       className={`absolute z-20 aspect-[706/229] w-[min(90vw,36.77vw)] max-lg:w-[88vw] ${
-        right ? "lg:top-[63.8dvh] lg:left-[58.54vw] max-lg:top-[69dvh] max-lg:right-[6vw]" : "lg:top-[15.46dvh] lg:left-[4.69vw] max-lg:top-[13dvh] max-lg:left-[6vw]"
+        right ? "lg:top-[63.8dvh] lg:left-[58.54vw] max-lg:top-[73dvh] max-lg:right-[6vw]" : "lg:top-[15.46dvh] lg:left-[4.69vw] max-lg:top-[10dvh] max-lg:left-[6vw]"
       }`}
     >
       <div
