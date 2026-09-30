@@ -33,6 +33,13 @@ const TEXT_SHRINK = (0.112 * 1080) / (BIG_ROW_VW * 1920);
 // everything else in this section.
 const ROW_GAP_VH = 0.02;
 const GRID_GAP_VH = 0.009;
+// Mobile gets a NEGATIVE gap. On a phone the four-step grid wraps to two rows, and step 1's
+// GIF reserves roughly half its canvas as transparent headroom for the cap's descent — so the
+// grid's box top sits ~184px above anything you can actually see, which read as a big empty
+// band under the headline. Pulling the box up tucks that dead region behind the headline, and
+// because it also shortens the centred block it drops the headline itself lower. Both of those
+// are wanted here; the overlap lands in the transparent area.
+const GRID_GAP_PX_MOBILE = -160;
 
 // Beat boundaries on the timeline. Phase 1 finishes at 1.38 (cap rise starts at 0.08, runs 1.3);
 // phase 2 opens on a deliberate short gap after it, and phase 3 starts the instant phase 2's
@@ -93,11 +100,12 @@ export default function HowItWorksScroll() {
     // to the bottom (Figma) independently. `grid.offsetHeight` is measured off the CSS
     // aspect-ratio boxes, so it's accurate before any GIF has actually loaded.
     const gridH = grid.offsetHeight;
-    const totalH = smallRowPx * 2 + ROW_GAP_VH * vh + GRID_GAP_VH * vh + gridH;
+    const gridGap = vw >= 1024 ? GRID_GAP_VH * vh : GRID_GAP_PX_MOBILE;
+    const totalH = smallRowPx * 2 + ROW_GAP_VH * vh + gridGap + gridH;
     const blockTop = vh / 2 - totalH / 2;
     const howDoesCenterY = blockTop + smallRowPx / 2;
     const itWorksCenterY = howDoesCenterY + smallRowPx + ROW_GAP_VH * vh;
-    const gridTopY = itWorksCenterY + smallRowPx / 2 + GRID_GAP_VH * vh;
+    const gridTopY = itWorksCenterY + smallRowPx / 2 + gridGap;
 
     const howDoesShift = howDoesCenterY - (vh / 2 - bigRowPx / 2);
     const itWorksShift = itWorksCenterY - (vh / 2 + bigRowPx / 2);
