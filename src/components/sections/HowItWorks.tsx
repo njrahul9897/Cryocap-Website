@@ -128,7 +128,19 @@ export default function HowItWorks() {
             className="flex w-[15vw] flex-col items-center gap-[1.875vw] opacity-0 max-lg:w-[40vw]"
           >
             <span className={`relative ${step.imgWidth}`} style={{ aspectRatio: step.ratio }}>
-              <Image src={step.src} alt={step.alt} fill unoptimized className="object-contain" />
+              {/* eager + low priority. Left lazy these four GIFs (7.9MB between them, and
+                  unoptimized so they are served as-is) only begin downloading as the section
+                  scrolls in — i.e. their fetch and first decode land inside the very scrub that
+                  is revealing them. Low priority keeps them behind the hero in the queue. */}
+              <Image
+                src={step.src}
+                alt={step.alt}
+                fill
+                unoptimized
+                loading="eager"
+                fetchPriority="low"
+                className="object-contain"
+              />
             </span>
             <p className="text-center text-[clamp(12px,1.1vw,20px)] leading-snug text-muted">
               <span className="mr-[0.4em] font-semibold text-ink">{i + 1}.</span>

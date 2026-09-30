@@ -16,20 +16,18 @@ const FIGURE_PARKED_SCALE = 0.714;
 const FIGURE_PARK_CLEARANCE_VH = 0.02;
 
 // Figma frame 17: all four words end up on ONE line at y=120, height 101 (down from 403), so
-// they scale to 101/403 and fly to these centres — fractions of the frame, x measured against
-// its width and y against its height, keyed by the same ids the markup uses.
+// they scale to 101/403 and fly to that line.
 const SMALL_SCALE = 101 / 403;
-const SMALL_CENTERS: Record<string, { cx: number; cy: number }> = {
-  where: { cx: 0.3737, cy: 0.1579 },
-  is: { cx: 0.482, cy: 0.1579 },
-  it: { cx: 0.5328, cy: 0.1579 },
-  used: { cx: 0.6331, cy: 0.1579 },
-};
-
-// Slide pitch is 960 + 50 = 1010px on the 1920 frame; the strip is parked with its first slide
-// centred at 104.17vw + 25vw, so this is how far left it travels to centre the last of five.
-const SLIDE_PITCH_VW = 1010 / 1920;
-const STRIP_START_CENTER_VW = 104.17 / 100 + 0.25;
+// Where that line sits, as a fraction of viewport height.
+const SMALL_LINE_CY = 0.1579;
+// Word spacing on it, in multiples of the SMALL font size. Figma's four words there are just
+// laid out left to right and centred on the frame: its three gaps are 25.7 / 26.4 / 26.2px
+// against an 80.2px small font, i.e. a constant 0.326em, and the resulting line is centred to
+// within half a pixel. So the line is BUILT that way here instead of flying each word to a
+// hardcoded x-centre off the 1920 frame. Those fractions only ever described desktop: a phone
+// sets the headline at 24vw rather than 16.67vw, so the same centres with 1.44x wider words
+// overlapped them by up to 11px — "is" began before "Where" had finished.
+const SMALL_WORD_GAP_EM = 0.326;
 
 // Beat boundaries. Phase 1 ends at 1.38 (mascot rise starts at 0.08, runs 1.3); phase 2 opens a
 // deliberate beat later; phase 3 starts the instant phase 2 lands, so the strip takes over with
@@ -43,11 +41,18 @@ export default function WhereUsedScroll() {
   useGSAP(() => {
     const section = document.querySelector<HTMLElement>("[data-whereused]");
     if (!section) return;
+    // DOM order is where / is / it / used, which is also their order on the small line
     const wordBoxes = Array.from(section.querySelectorAll<HTMLElement>("[data-whereused-word]"));
     const glyphs = Array.from(section.querySelectorAll<HTMLElement>("[data-whereused-glyph]"));
     const figure = section.querySelector<HTMLElement>("[data-whereused-figure]");
     const strip = section.querySelector<HTMLElement>("[data-whereused-strip]");
-    if (!figure || !strip || wordBoxes.length === 0) return;
+    // the photo itself, not the whole figure: the caption hangs below it, and it is the photo
+    // that has to come to rest dead centre.
+    // NOT `:last-of-type` — that is scoped to each photo's own parent, and every figure holds
+    // exactly one span, so all five matched and querySelector handed back the FIRST slide.
+    const slides = Array.from(strip?.querySelectorAll<HTMLElement>("[data-whereused-slide]") ?? []);
+    const lastSlide = slides[slides.length - 1];
+    if (!figure || !strip || !lastSlide || wordBoxes.length === 0 || glyphs.length === 0) return;
 
     const vh = window.innerHeight;
     const vw = window.innerWidth;
@@ -72,18 +77,43 @@ export default function WhereUsedScroll() {
 
     gsap.set(figure, { y: figureTravel, scale: FIGURE_PARKED_SCALE });
 
-    // Each word flies from wherever the markup put it to its own small-line centre.
-    const wordTargets = wordBoxes.map((el) => {
-      const target = SMALL_CENTERS[el.dataset.whereusedWord ?? ""];
+    // The small line, measured rather than tabulated: take each word at its rendered width,
+    // lay the four out left to right with one constant gap, and centre the run on the viewport.
+    const smallFont = parseFloat(getComputedStyle(glyphs[0]).fontSize) * SMALL_SCALE;
+    const wordGap = SMALL_WORD_GAP_EM * smallFont;
+    const smallWidths = wordBoxes.map((el) => el.offsetWidth * SMALL_SCALE);
+    const lineWidth = smallWidths.reduce((a, b) => a + b, 0) + wordGap * (wordBoxes.length - 1);
+
+    let cursor = vw / 2 - lineWidth / 2;
+    const wordTargets = wordBoxes.map((el, i) => {
       const from = centerOf(el);
-      return target
-        ? { el, x: target.cx * vw - from.cx, y: target.cy * vh - from.cy }
-        : { el, x: 0, y: 0 };
+      const cx = cursor + smallWidths[i] / 2;
+      cursor += smallWidths[i] + wordGap;
+      return { el, x: cx - from.cx, y: SMALL_LINE_CY * vh - from.cy };
     });
 
-    // How far left the strip must go to bring the LAST slide's centre onto the viewport centre.
-    const lastSlideCenterVw = STRIP_START_CENTER_VW + (strip.children.length - 1) * SLIDE_PITCH_VW;
-    const stripTravel = (lastSlideCenterVw - 0.5) * vw;
+    // Distance from an element's own box back up to `root`, along the offsetParent chain —
+    // here all the way to the section, so it transparently absorbs whatever sits in between.
+    // That matters: on a phone the strip is nested in a clip window, which becomes its
+    // containing block, so its own `top` is no longer measured from the section.
+    const offsetWithin = (el: HTMLElement, root: HTMLElement, axis: "top" | "left") => {
+      let total = 0;
+      let node: HTMLElement | null = el;
+      while (node && node !== root) {
+        total += axis === "top" ? node.offsetTop : node.offsetLeft;
+        node = node.offsetParent as HTMLElement | null;
+      }
+      return total;
+    };
+
+    // How far the strip must travel to bring the LAST photo's centre onto the viewport centre —
+    // left on desktop, up on a phone, where the strip is a column parked below the fold. Both
+    // are measured off the laid-out DOM rather than re-deriving Figma's slide pitch in vw, so
+    // the two directions share one expression and neither can drift from the CSS.
+    const stripVertical = vw < 1024;
+    const stripTravel = stripVertical
+      ? offsetWithin(lastSlide, section, "top") + lastSlide.offsetHeight / 2 - vh / 2
+      : offsetWithin(lastSlide, section, "left") + lastSlide.offsetWidth / 2 - vw / 2;
 
     const tl = gsap.timeline({
       defaults: { ease: "power2.out" },
@@ -115,10 +145,14 @@ export default function WhereUsedScroll() {
       PHASE_2,
     );
 
-    // Phase 3 — the photo strip scrolls in from the right and stops with the last one centred,
-    // which is where the footer takes over. Linear: a scrubbed horizontal pan reads as a direct
-    // response to the wheel, and any easing here would feel like drag.
-    tl.to(strip, { x: -stripTravel, duration: STRIP_DUR, ease: "none" }, PHASE_3);
+    // Phase 3 — the photo strip scrolls in and stops with the last one centred, which is where
+    // the footer takes over. Linear: a scrubbed pan reads as a direct response to the gesture,
+    // and any easing here would feel like drag.
+    tl.to(
+      strip,
+      { ...(stripVertical ? { y: -stripTravel } : { x: -stripTravel }), duration: STRIP_DUR, ease: "none" },
+      PHASE_3,
+    );
 
     ScrollTrigger.refresh();
   }, []);
