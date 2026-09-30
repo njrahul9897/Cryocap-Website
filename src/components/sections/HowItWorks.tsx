@@ -22,6 +22,10 @@ const foregroundRow = `${row} relative z-20`;
 // it. In the Figma prototype this is a hard cut to a new frame; here it is a continuation of
 // the SAME text elements above (scaled + translated by HowItWorksScroll), never unmounted, so
 // there is nothing to disappear and reappear.
+// `imgWidth` carries a mobile width too, because step 1's can and the phone mockups are NOT
+// the same width: the can GIF reserves about half its canvas as transparent headroom, so it
+// has to be ~0.64x the phones for the VISIBLE bottle to match their height once the cap has
+// seated. A single shared mobile width made the can 1.55x the phones.
 type Step = { src: string; alt: string; ratio: string; imgWidth: string; caption: React.ReactNode };
 
 const steps: Step[] = [
@@ -29,7 +33,7 @@ const steps: Step[] = [
     src: "/how-it-works/install-cap.gif",
     alt: "The Cryocap smart cap lowering onto the container's neck",
     ratio: "116/487",
-    imgWidth: "w-[6vw]",
+    imgWidth: "w-[14vw] lg:w-[6vw]",
     caption: (
       <>
         Install the Cryocap<sup className="text-[0.6em]">TM</sup> on the container
@@ -40,21 +44,21 @@ const steps: Step[] = [
     src: "/how-it-works/connect-device.gif",
     alt: "Enabling Bluetooth to pair the cap with the Aone app",
     ratio: "180/238",
-    imgWidth: "w-[9.4vw]",
+    imgWidth: "w-[22vw] lg:w-[9.4vw]",
     caption: "Connects to your Aone system",
   },
   {
     src: "/how-it-works/monitor-dashboard.gif",
     alt: "Aone dashboard showing live temperature and nitrogen level",
     ratio: "180/238",
-    imgWidth: "w-[9.4vw]",
+    imgWidth: "w-[22vw] lg:w-[9.4vw]",
     caption: "Monitors temperature, nitrogen & location",
   },
   {
     src: "/how-it-works/notification-alert.gif",
     alt: "Temperature drop alert notification over the dashboard",
     ratio: "180/238",
-    imgWidth: "w-[9.4vw]",
+    imgWidth: "w-[22vw] lg:w-[9.4vw]",
     caption: "Sends instant alerts if something is wrong",
   },
 ];
@@ -123,7 +127,7 @@ export default function HowItWorks() {
             // on first paint before HowItWorksScroll has parked them
             className="flex w-[15vw] flex-col items-center gap-[1.875vw] opacity-0 max-lg:w-[40vw]"
           >
-            <span className={`relative ${step.imgWidth} max-lg:w-[22vw]`} style={{ aspectRatio: step.ratio }}>
+            <span className={`relative ${step.imgWidth}`} style={{ aspectRatio: step.ratio }}>
               <Image src={step.src} alt={step.alt} fill unoptimized className="object-contain" />
             </span>
             <p className="text-center text-[clamp(12px,1.1vw,20px)] leading-snug text-muted">

@@ -39,7 +39,11 @@ const GRID_GAP_VH = 0.009;
 // band under the headline. Pulling the box up tucks that dead region behind the headline, and
 // because it also shortens the centred block it drops the headline itself lower. Both of those
 // are wanted here; the overlap lands in the transparent area.
-const GRID_GAP_PX_MOBILE = -160;
+// Fraction of step 1's image box that is transparent headroom (its ink starts 1266px down a
+// 2472px canvas). Deriving the pull from the box means it stays right if that image is resized.
+const INSTALL_GIF_HEADROOM = 1266 / 2472;
+// A little air left between the headline and the first thing you can actually see.
+const GRID_GAP_PX_MOBILE = 8;
 
 // Beat boundaries on the timeline. Phase 1 finishes at 1.38 (cap rise starts at 0.08, runs 1.3);
 // phase 2 opens on a deliberate short gap after it, and phase 3 starts the instant phase 2's
@@ -100,7 +104,10 @@ export default function HowItWorksScroll() {
     // to the bottom (Figma) independently. `grid.offsetHeight` is measured off the CSS
     // aspect-ratio boxes, so it's accurate before any GIF has actually loaded.
     const gridH = grid.offsetHeight;
-    const gridGap = vw >= 1024 ? GRID_GAP_VH * vh : GRID_GAP_PX_MOBILE;
+    // direct child: each item also has a <span> inside its caption for the step number
+    const firstImg = grid.querySelector<HTMLElement>("[data-howitworks-item] > span");
+    const headroom = firstImg ? firstImg.offsetHeight * INSTALL_GIF_HEADROOM : 0;
+    const gridGap = vw >= 1024 ? GRID_GAP_VH * vh : GRID_GAP_PX_MOBILE - headroom;
     const totalH = smallRowPx * 2 + ROW_GAP_VH * vh + gridGap + gridH;
     const blockTop = vh / 2 - totalH / 2;
     const howDoesCenterY = blockTop + smallRowPx / 2;
