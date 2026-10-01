@@ -124,6 +124,25 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
                   Submit
                 </Button>
               </form>
+
+              {/* Not everyone wants to fill in a form, so the two routes the team actually
+                  monitors are offered directly. The rule above them matters: without it these
+                  read as two more fields hanging off the bottom of the form rather than an
+                  alternative to it. */}
+              <div className="mt-[clamp(20px,1.77vw,32px)] border-t border-ink/10 pt-[clamp(16px,1.35vw,24px)]">
+                <h3 className="text-[clamp(11px,0.73vw,13px)] font-semibold uppercase tracking-[0.08em] text-muted">
+                  Other ways to reach us
+                </h3>
+                <div className="mt-[clamp(10px,0.9vw,16px)] flex flex-col gap-[clamp(8px,0.73vw,12px)]">
+                  <ReachLink href="mailto:cryocap@atsuyatech.com" text="cryocap@atsuyatech.com">
+                    <path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h15A1.5 1.5 0 0 1 21 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 17.5z" />
+                    <path d="m3.6 6.9 8.4 6 8.4-6" />
+                  </ReachLink>
+                  <ReachLink href="tel:+916385731933" text="+91 6385731933">
+                    <path d="M7.2 4h3l1.5 3.8-2 1.3a11 11 0 0 0 5.2 5.2l1.3-2 3.8 1.5v3a1.5 1.5 0 0 1-1.6 1.5A15.5 15.5 0 0 1 5.7 5.6 1.5 1.5 0 0 1 7.2 4Z" />
+                  </ReachLink>
+                </div>
+              </div>
             </>
           ) : (
             <div className="flex flex-col items-center gap-[clamp(14px,1.25vw,20px)] py-[clamp(10px,1.04vw,16px)] text-center">
@@ -161,6 +180,34 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
         </div>
       </dialog>
     </ContactModalContext.Provider>
+  );
+}
+
+// Email and phone are drawn inline rather than pulled from /public/icons: that set has no
+// envelope, and pairing its filled phone with an inline outline envelope would put two
+// different stroke weights side by side in the same list.
+function ReachLink({ href, text, children }: { href: string; text: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      className="flex items-center gap-[clamp(10px,0.833vw,14px)] text-[clamp(13px,0.9vw,16px)] text-ink transition-colors hover:text-accent"
+    >
+      <span className="flex size-[clamp(30px,2.08vw,38px)] shrink-0 items-center justify-center rounded-full bg-surface text-accent">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="size-[52%]"
+          aria-hidden="true"
+        >
+          {children}
+        </svg>
+      </span>
+      <span className="truncate">{text}</span>
+    </a>
   );
 }
 
