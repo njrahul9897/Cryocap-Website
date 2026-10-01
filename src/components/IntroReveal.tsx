@@ -176,7 +176,15 @@ export default function IntroReveal() {
 
   return (
     <>
-      <div ref={root} id="intro" className="pointer-events-none fixed inset-0 z-[100]" aria-hidden="true">
+      {/* touch-none, and NOT pointer-events-none, is what actually holds a real phone still.
+          Chrome on Android decides whether a swipe scrolls on the compositor thread, so a
+          main-thread touchmove handler can lose the race while GSAP has the main thread busy
+          animating this very overlay — which is why the lock held under emulation (where
+          touches go through the main thread) but not on a real device. touch-action is
+          resolved from the element the finger actually hits, so letting this full-screen
+          overlay be that element blocks the pan before the compositor ever starts one. It is
+          display:none'd the moment the intro finishes, so nothing below it stays blocked. */}
+      <div ref={root} id="intro" className="fixed inset-0 z-[100] touch-none" aria-hidden="true">
         <div data-window className="absolute inset-x-0 top-1/2 h-[20.4dvh] -translate-y-1/2 overflow-hidden">
           <div data-phrase className={word}>
             <Letters text="World’s First" />
