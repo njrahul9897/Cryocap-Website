@@ -12,13 +12,15 @@ type Props = {
 // with the description underneath. Sizes are vw-scaled off the 1920 frame like the rest of
 // the project, so the card holds its proportions down to tablet widths.
 
-// All these icons share a 36x36 viewBox except water-drop.svg, which is both non-square AND
-// drawn with far less internal padding than the rest (its ink nearly fills the full height).
-// Fitting it into the same box with `object-contain` fixes the stretch but not this: it still
-// reads visibly bigger than the others, since they only fill ~75% of their box. Scaling it down
-// to match brings its rendered size in line with its neighbours.
+// Most of these icons share a 36x36 viewBox, but water-drop.svg (26.7x34.5) and bell.svg
+// (33.2x34.5) are both non-square AND drawn with far less internal padding than the rest
+// (their ink nearly fills the full height). Fitting them into the same box with
+// `object-contain` fixes the stretch but not this: they still read visibly bigger than the
+// others, which only fill ~75% of their box. Scaling them down to match brings their rendered
+// size in line with their neighbours.
 const ICON_SCALE: Record<string, string> = {
   "/icons/water-drop.svg": "scale-75",
+  "/icons/bell.svg": "scale-75",
 };
 
 export default function SolutionCard({ icon, title, badge, description }: Props) {
