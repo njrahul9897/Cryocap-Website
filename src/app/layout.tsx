@@ -33,7 +33,28 @@ export const viewport: Viewport = {
 // effect: `scrollRestoration` belongs to the document, resets to "auto" on every navigation, and
 // is consulted before React has run at all, so setting it from the previous document does
 // nothing for the reload.
-const NO_SCROLL_RESTORE = "try{history.scrollRestoration='manual'}catch(e){}";
+// Same reasoning applies to the intro's scroll lock, which is why it is bolted on here rather
+// than left to CSS alone. `overflow:hidden` is advisory on iOS Safari — the body keeps panning
+// underneath it — and `touch-action` has its own gaps on the document scroller. Cancelling
+// touchmove is the one thing every mobile browser honours, and installing it from this script
+// means it is live while the HTML is still parsing, long before hydration could attach it. The
+// listener reads the attribute on each event instead of capturing state, so IntroReveal
+// removing that attribute is all it takes to hand scrolling back, and the listener then
+// unregisters itself on its next call.
+const SCROLL_SETUP = `
+try{history.scrollRestoration='manual'}catch(e){}
+(function(){
+  var html=document.documentElement;
+  var block=function(e){
+    if(!html.hasAttribute('data-intro-pending')){
+      document.removeEventListener('touchmove',block,{capture:true});
+      return;
+    }
+    if(e.cancelable){e.preventDefault()}
+  };
+  document.addEventListener('touchmove',block,{passive:false,capture:true});
+})();
+`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -42,7 +63,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // it drives in globals.css.
     <html lang="en" data-intro-pending="" className={`${jakarta.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <script dangerouslySetInnerHTML={{ __html: NO_SCROLL_RESTORE }} />
+        <script dangerouslySetInnerHTML={{ __html: SCROLL_SETUP }} />
         {/* With JS off there is no intro, and nothing ever runs to release the lock, so it has
             to let go on its own rather than leaving the page unscrollable. */}
         <noscript>
