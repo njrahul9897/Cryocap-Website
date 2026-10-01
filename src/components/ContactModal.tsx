@@ -111,7 +111,16 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
                 <Field label="Email ID" name="email" type="email" autoComplete="email" required />
                 <Field label="Phone Number" name="phone" type="tel" autoComplete="tel" required />
                 <Field label="Organisation" name="organisation" autoComplete="organization" />
-                <Button type="submit" className="mt-[clamp(4px,0.625vw,12px)] w-full justify-center">
+                {/* Button's own py/leading-none make it noticeably shorter than the fields above it
+                    (measured 40px against the fields' 52px at this viewport) — an explicit height
+                    sidesteps that mismatch directly rather than fighting Button's base padding/
+                    line-height classes for precedence. Calibrated off the field's OWN measured
+                    height at its floor (40px) and at the 1920 reference width this project sizes
+                    everything against (52px), matching both ends exactly. */}
+                <Button
+                  type="submit"
+                  className="mt-[clamp(4px,0.625vw,12px)] h-[clamp(40px,2.708vw,52px)] w-full justify-center"
+                >
                   Submit
                 </Button>
               </form>
