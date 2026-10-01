@@ -118,10 +118,10 @@ export default function Footer() {
         </p>
         <div className="flex gap-4">
           <Button variant="outline" icon="/icons/play.svg" className="w-[clamp(130px,8.75vw,168px)]">
-            Watch Video
+            How it works
           </Button>
           <Button href="/buy" icon="/icons/cart.svg" className="w-[clamp(130px,8.75vw,168px)]">
-            Buy Now
+            Book a demo
           </Button>
         </div>
 

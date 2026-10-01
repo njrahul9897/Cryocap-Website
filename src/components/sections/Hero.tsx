@@ -98,33 +98,37 @@ export default function Hero() {
         <div className="pointer-events-none absolute top-[27.5dvh] right-[6vw] z-10 text-right lg:top-[15.46dvh] lg:right-[4.69vw]">
           <div className="h-[5.99vw] overflow-hidden">
             <p data-stage="label-generic" className={`${ghost} text-[6.56vw] translate-y-full`}>
-              generic
+              ordinary
             </p>
           </div>
           <div className="h-[5.99vw] overflow-hidden">
             <p data-stage="label-generic" className={`${ghost} text-[6.56vw] translate-y-full`}>
-              cap
+              lid
             </p>
           </div>
         </div>
 
-        <Callout side="left" pair="a" icon="/icons/water-drop.svg" title="Nitrogen Loss Happens" description="Even well-sealed containers typically lose a small but measurable amount daily." />
-        <Callout side="right" pair="a" icon="/icons/temperature.svg" title="Temperature Fluctuates" description="Nitrogen stored in a container is lost gradually as temperature fluctuations cause pressure changes and boil-off" />
-        <Callout side="left" pair="b" icon="/icons/bell.svg" title="You Don’t Realize In-time" description="By the time the drop is significant enough to catch attention, a considerable amount has already escaped" />
-        <Callout side="right" pair="b" icon="/icons/caution.svg" title="Semen Quality Get Affected" description="This can damage sperm membrane integrity, reduce motility, and lower overall fertility potential" />
+        {/* Six pointers now (was four): StageScroll reveals/dismisses one left/right pair at a
+            time, so a third pair ("c") just needs the same treatment as a/b there. */}
+        <Callout side="left" pair="a" icon="/icons/water-drop.svg" title="Nitrogen evaporates, always" description="Liquid nitrogen boils at −196°C, so it keeps turning to gas even in a sealed can that’s never opened." />
+        <Callout side="right" pair="a" icon="/icons/temperature.svg" title="Every opening speeds it up" description="Opening the lid lets warm air in, so nitrogen escapes faster and the temperature inside shifts." />
+        <Callout side="left" pair="b" icon="/icons/temperature-snow.svg" title="Heat and travel add to the loss" description="Hot days and long rides between centres and villages drain a can faster than you’d expect." />
+        <Callout side="right" pair="b" icon="/icons/caution.svg" title="Lifting canisters warms the straws" description="A canister should spend at most 10 seconds in the neck of the tank. Every extra second warms every straw inside it." />
+        <Callout side="left" pair="c" icon="/icons/bell.svg" title="Dipstick checks come too late" description="Levels are checked by hand, now and then. By the time a drop shows up, the damage may already be done." />
+        <Callout side="right" pair="c" icon="/icons/caution.svg" title="Fertility is lost for good" description="Above −130°C, sperm is permanently damaged, and putting it back in nitrogen doesn’t undo it. The cow comes back into heat, and nobody knows why." />
 
         <Product data-intro="rise" className="invisible absolute left-1/2 top-[24dvh] z-30 h-[40dvh] opacity-0 lg:top-[17.47dvh] lg:left-[50.42%] lg:h-[min(60.27dvh,33.9vw)]" />
 
         <div data-intro="chrome" data-stage="copy-bottom" className="invisible absolute left-1/2 top-[70dvh] z-20 flex w-[88vw] -translate-x-1/2 opacity-0 flex-col items-center gap-6 lg:top-[82.7dvh] lg:w-auto lg:gap-9">
           <p className="text-center text-base text-muted lg:whitespace-nowrap lg:text-[clamp(1rem,1.04vw,1.25rem)]">
-            Smart Monitoring for Safer &amp; Better Livestock Breeding
+            Don’t open the can. Open the app.
           </p>
           <div className="flex w-full justify-center gap-3 sm:w-auto sm:gap-4">
             <Button variant="outline" icon="/icons/play.svg" className="w-[calc(50%-0.375rem)] max-w-[168px] sm:w-[clamp(130px,8.75vw,168px)]">
-              Watch Video
+              How it works
             </Button>
             <Button href="/buy" icon="/icons/cart.svg" className="w-[calc(50%-0.375rem)] max-w-[168px] sm:w-[clamp(130px,8.75vw,168px)]">
-              Buy Now
+              Book a demo
             </Button>
           </div>
         </div>

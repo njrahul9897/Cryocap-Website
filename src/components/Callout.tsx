@@ -2,7 +2,7 @@ import Image from "next/image";
 
 type Props = {
   side: "left" | "right";
-  pair: "a" | "b";
+  pair: "a" | "b" | "c";
   icon: string;
   title: string;
   description: string;
@@ -44,7 +44,17 @@ export default function Callout({ side, pair, icon, title, description }: Props)
       </div>
 
       <div className={`absolute top-[37.55%] h-[27.5%] w-full overflow-hidden ${right ? "text-right" : ""}`}>
-        <h3 data-callout-title className="opacity-0 text-[clamp(20px,2.6vw,50px)] font-extrabold leading-[1.26] whitespace-nowrap">
+        <h3
+          data-callout-title
+          // Six pointers now, two of them notably longer ("Lifting canisters warms the
+          // straws", "Heat and travel add to the loss") than anything the original four hit —
+          // at the shared clamp's desktop size the longest overflowed its 706px box by ~126px
+          // and got clipped by the wrapper's `overflow-hidden`. Scaled down ~20% (measured via
+          // canvas text metrics against the longest title) so even that one fits with margin;
+          // mobile's box is proportionally far more generous (88vw vs 36.77vw) and was never
+          // at risk, so only the lg+ size changes.
+          className="opacity-0 text-[clamp(20px,2.6vw,50px)] font-extrabold leading-[1.26] whitespace-nowrap lg:text-[clamp(20px,2.08vw,40px)]"
+        >
           {title}
         </h3>
       </div>

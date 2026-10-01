@@ -15,7 +15,7 @@ const SECONDS_TO_PX = 260;
 const CARD_SCROLL = 10;
 // how much a card swells as it crosses the middle of the screen
 const CARD_ZOOM = 0.08;
-const TOTAL = 26;
+const TOTAL = 30.1;
 
 export default function StageScroll() {
   const [ready, setReady] = useState(false);
@@ -59,6 +59,7 @@ export default function StageScroll() {
       });
       const a = pair("a");
       const b = pair("b");
+      const c = pair("c");
 
       const vh = window.innerHeight;
       const vw = window.innerWidth;
@@ -88,7 +89,10 @@ export default function StageScroll() {
       // the row a comfortable distance past the top — it is off-screen either way.
       const copyTravel = Math.max(0.944 * vh, copyBottomY + Math.max(0.06 * vh, 48));
 
-      gsap.set([...a.icons, ...a.titles, ...a.descs, ...b.icons, ...b.titles, ...b.descs], { yPercent: -130, autoAlpha: 0, filter: "blur(0px)" });
+      gsap.set(
+        [...a.icons, ...a.titles, ...a.descs, ...b.icons, ...b.titles, ...b.descs, ...c.icons, ...c.titles, ...c.descs],
+        { yPercent: -130, autoAlpha: 0, filter: "blur(0px)" },
+      );
       gsap.set(generic, genParked);
       // the contact shadow stays put on the can — it is cast onto the shoulder, so it fades in
       // as the cap makes contact rather than travelling with it
@@ -157,7 +161,8 @@ export default function StageScroll() {
       tl.to(labelGeneric, { yPercent: -100, duration: 0.5, stagger: 0.1 }, 4.0);
       tl.to(lines, { scaleX: 1, duration: 0.5, ease: "power2.out" }, 4.2);
 
-      // 5. callout pair A in, out; pair B in, out
+      // 5. callout pairs A, B, C in turn, each held long enough to read its (now two-sentence)
+      // description before the next one replaces it.
       const reveal = (p: ReturnType<typeof pair>, at: number) => {
         tl.to(p.icons, { yPercent: 0, autoAlpha: 1, duration: 0.4, ease: "power2.out" }, at);
         tl.to(p.titles, { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: "power2.out" }, at + 0.05);
@@ -166,18 +171,28 @@ export default function StageScroll() {
       const dismiss = (p: ReturnType<typeof pair>, at: number) => {
         tl.to([...p.icons, ...p.titles, ...p.descs], { yPercent: -130, autoAlpha: 0, filter: "blur(6px)", duration: 0.4, ease: "power2.in" }, at);
       };
-      reveal(a, 4.8);
-      dismiss(a, 7.0);
-      reveal(b, 7.5);
-      dismiss(b, 11.0);
-      tl.to([labelProblems, ...labelGeneric], { yPercent: -200, duration: 0.5 }, 11.0);
-      tl.to(lines, { scaleX: 0, duration: 0.4, ease: "power2.in" }, 11.2);
+      // Three equal 3.2s holds with a 0.1s beat between a dismiss landing and the next pair's
+      // reveal starting, same gap the original two-pair timeline used.
+      const PAIR_HOLD = 3.2;
+      const PAIR_GAP = 0.1;
+      const aAt = 4.8;
+      const bAt = aAt + PAIR_HOLD + 0.4 + PAIR_GAP;
+      const cAt = bAt + PAIR_HOLD + 0.4 + PAIR_GAP;
+      const dismissCAt = cAt + PAIR_HOLD;
+      reveal(a, aAt);
+      dismiss(a, aAt + PAIR_HOLD);
+      reveal(b, bAt);
+      dismiss(b, bAt + PAIR_HOLD);
+      reveal(c, cAt);
+      dismiss(c, dismissCAt);
+      tl.to([labelProblems, ...labelGeneric], { yPercent: -200, duration: 0.5 }, dismissCAt);
+      tl.to(lines, { scaleX: 0, duration: 0.4, ease: "power2.in" }, dismissCAt + 0.2);
 
       // 6. generic cap lifts away; can stands up and moves to the solutions position.
       // The wrapper is back at 0 here (can tilted), so this reads as the 15deg diagonal lift
       // the design shows in frames 6 -> 7 (+169x / -607y).
-      tl.to(generic, { ...genParked, duration: 0.6, ease: "power2.in" }, 11.2);
-      tl.to(genericShadow, { autoAlpha: 0, duration: 0.3 }, 11.2);
+      tl.to(generic, { ...genParked, duration: 0.6, ease: "power2.in" }, dismissCAt + 0.2);
+      tl.to(genericShadow, { autoAlpha: 0, duration: 0.3 }, dismissCAt + 0.2);
       // Figma frame 8/9 puts the upright can at x=306.31 y=209.01, 342.77 x 685.54 in the
       // 1920x1080 frame. Against the hero can (293.29 wide, centre 968.03/518.14) that is a
       // 1.1687 scale and a centre move of -491.6 / +33.1 — solved through the wrapper's own
@@ -194,24 +209,24 @@ export default function StageScroll() {
           y: heroLift + (desktop ? 0.0307 * vh : 0),
           duration: 1.0,
         },
-        11.8,
+        dismissCAt + 0.8,
       );
 
       // 7. Cryocap cap returns (branding with it), then SOLUTIONS sweeps across.
       // The wrapper sits at -15deg here, so unwinding the tilted lift reads as a straight drop on screen.
-      tl.to(cap, { x: 0, y: 0, duration: 0.6, ease: "power2.in" }, 13.2);
-      tl.to(canPlain, { autoAlpha: 0, duration: 0.3 }, 13.6);
-      tl.to(sweepSolutions, { x: -(vw + sweepSolutions.offsetWidth), duration: 1.6, ease: "none" }, 14.2);
+      tl.to(cap, { x: 0, y: 0, duration: 0.6, ease: "power2.in" }, dismissCAt + 2.2);
+      tl.to(canPlain, { autoAlpha: 0, duration: 0.3 }, dismissCAt + 2.6);
+      tl.to(sweepSolutions, { x: -(vw + sweepSolutions.offsetWidth), duration: 1.6, ease: "none" }, dismissCAt + 3.2);
 
       // 8. Solutions: the ghost wordmark slides up out of its clip window, then the six cards
       // ride up the right-hand side past the parked can. The travel is measured off the real
       // stack height so every card clears the top whatever the viewport.
-      tl.to(solutionsWord, { yPercent: -100, duration: 0.6 }, 15.0);
+      tl.to(solutionsWord, { yPercent: -100, duration: 0.6 }, dismissCAt + 4.0);
       // Parked a clear margin below the stage (not flush with the fold, which left the top
       // card's ring showing) and held hidden until the solutions beat actually starts.
       gsap.set(solutionsCards, { y: stage.offsetHeight * 1.1, autoAlpha: 0 });
-      tl.set(solutionsCards, { autoAlpha: 1 }, 15.2);
-      tl.to(solutionsCards, { y: -solutionsCards.offsetHeight, duration: CARD_SCROLL, ease: "none" }, 15.5);
+      tl.set(solutionsCards, { autoAlpha: 1 }, dismissCAt + 4.2);
+      tl.to(solutionsCards, { y: -solutionsCards.offsetHeight, duration: CARD_SCROLL, ease: "none" }, dismissCAt + 4.5);
       cardZoom();
 
       tl.to({}, { duration: 0.2 }, TOTAL - 0.2);
