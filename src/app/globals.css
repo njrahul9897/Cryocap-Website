@@ -59,22 +59,6 @@ html.lenis body {
   overflow: hidden;
 }
 
-/* The intro's scroll lock. It is keyed off an attribute the server already renders, rather
-   than being applied from an effect: hydration can be several seconds away on a mid-range
-   phone over a slow link, and for all of that time an effect-applied lock does not exist —
-   the page scrolls freely behind the intro, so the bars open onto "How it works" instead of
-   the hero. `overflow` alone also does not hold on iOS Safari, where the body keeps panning
-   underneath it; touch-action is what actually stops a finger there. The second declaration
-   wins where it is understood, keeping pinch-zoom available to anyone who needs it, and
-   browsers that do not know the value fall back to the `none` above. */
-html[data-intro-pending],
-html[data-intro-pending] body {
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-  touch-action: pinch-zoom;
-}
-
 /* Figma "Grid Layer": 100px cells in the 1920x1080 frame, lines fading in toward the bottom */
 .grid-lines {
   --cell: 5.208vw;
@@ -134,22 +118,6 @@ body {
 
 .lenis.lenis-stopped {
   overflow: hidden;
-}
-
-/* The intro's scroll lock. It is keyed off an attribute the server already renders, rather
-   than being applied from an effect: hydration can be several seconds away on a mid-range
-   phone over a slow link, and for all of that time an effect-applied lock does not exist —
-   the page scrolls freely behind the intro, so the bars open onto "How it works" instead of
-   the hero. `overflow` alone also does not hold on iOS Safari, where the body keeps panning
-   underneath it; touch-action is what actually stops a finger there. The second declaration
-   wins where it is understood, keeping pinch-zoom available to anyone who needs it, and
-   browsers that do not know the value fall back to the `none` above. */
-html[data-intro-pending],
-html[data-intro-pending] body {
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-  touch-action: pinch-zoom;
 }
 
 /* Figma "Grid Layer": 100px cells in the 1920x1080 frame, lines fading in toward the bottom */
@@ -216,4 +184,26 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   overflow-x: hidden;
+}
+
+/* The intro's scroll lock, last in the file so it wins over the `height: auto` Lenis sets on
+   the same elements. Keyed off an attribute the server already renders rather than applied
+   from an effect, because hydration can be seconds away on a phone and until then an
+   effect-applied lock does not exist.
+
+   The height clamp is what actually does the work. Blocking gestures turned out to be a losing
+   game — overflow is advisory on iOS, a main-thread touchmove handler loses the race against
+   Chrome's compositor on Android — so instead of fighting the scroll, this leaves nothing to
+   scroll: the body is held to one viewport and clipped, so the document has no scrollable
+   overflow at all while the intro is up. The rest are belt and braces. */
+html[data-intro-pending],
+html[data-intro-pending] body {
+  /* Both elements, not just the body: Lenis puts `height: auto` on the html element, which
+     then grows to the full document, and a body clamped to 100% of THAT is the whole page
+     again. Clamping html to the viewport is what makes the body's 100% mean one screen. */
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  touch-action: pinch-zoom;
 }

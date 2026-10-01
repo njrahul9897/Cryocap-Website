@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap, useGSAP } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { getLenis } from "@/lib/lenis-store";
 import { INTRO_DONE_EVENT } from "@/components/StageScroll";
 
@@ -65,6 +65,11 @@ export default function IntroReveal() {
         unlock();
         html.dataset.introDone = "1";
         window.dispatchEvent(new Event(INTRO_DONE_EVENT));
+        // The document is clamped to one viewport while the intro runs, so every trigger built
+        // during it — HowItWorks, WhereUsed, Footer all build on mount, not on this event —
+        // measured against a page with no scrollable height. Re-measure once the real height is
+        // back and the listeners above have built whatever they build off this event.
+        requestAnimationFrame(() => ScrollTrigger.refresh());
       };
       // Selector strings would be scoped to `root`; these live in the page outside it.
       const pick = (kind: string) => Array.from(document.querySelectorAll<HTMLElement>(`[data-intro='${kind}']`));
