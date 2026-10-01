@@ -3,14 +3,14 @@ import HowItWorksScroll from "@/components/HowItWorksScroll";
 
 // Centered variant of Figma frames 11 -> 12 (the source design left-aligns the headline; this
 // section centers both the text and the probe on the page instead). Each word sits in its own
-// clip window and slides up on its own beat, so "How" / "does" / "It" / "works" reveal one
+// clip window and slides up on its own beat, so "How" / "does" / "It" / "work" reveal one
 // after another rather than each line arriving as a single unit.
 const word = "text-[14.8vw] font-extrabold uppercase leading-[0.909] whitespace-nowrap";
 // `gap-[0.28em]` resolves against the row's OWN font-size, not the 14.8vw text inside it — so
 // the row needs that same size set on it too, or the em unit collapses to the inherited body
 // size and the words end up touching.
 const row = "flex gap-[0.28em] text-[14.8vw]";
-// "It works" needs `relative` for z-index to apply at all (z-index is a no-op on static
+// "It work" needs `relative` for z-index to apply at all (z-index is a no-op on static
 // elements) — once positioned, it paints above the cap's z-10 in the shared section-level
 // stacking context (the flex-col wrapper around both rows has no z-index of its own, so it
 // never isolates them into their own context; "How does" stays unpositioned/z-auto and so
@@ -18,7 +18,7 @@ const row = "flex gap-[0.28em] text-[14.8vw]";
 const foregroundRow = `${row} relative z-20`;
 
 // Figma's "How does it work - animation" panel (frames 14/15): the same "How does" / "It
-// works" pair reappears, shrunk and moved up, with four device-flow animations lined up below
+// work" pair reappears, shrunk and moved up, with four device-flow animations lined up below
 // it. In the Figma prototype this is a hard cut to a new frame; here it is a continuation of
 // the SAME text elements above (scaled + translated by HowItWorksScroll), never unmounted, so
 // there is nothing to disappear and reappear.
@@ -83,13 +83,13 @@ export default function HowItWorks() {
             <p data-howitworks-word className={`${word} translate-y-full text-ink`}>It</p>
           </div>
           <div className="h-[13.46vw] overflow-hidden">
-            <p data-howitworks-word className={`${word} translate-y-full text-ink`}>works</p>
+            <p data-howitworks-word className={`${word} translate-y-full text-ink`}>work</p>
           </div>
         </div>
       </div>
 
       {/* Dead center of the section, so it lands in the gap between the two rows above. It is
-          the middle layer of the stack: in front of "How does", but "It works" (z-20 above)
+          the middle layer of the stack: in front of "How does", but "It work" (z-20 above)
           rises over it as the cap settles (Figma: unrotated at the start, -30deg once it lands
           — the orange top leans left, probe to the right). It then retreats back down the way it
           came, leaving the frame before the steps below arrive; it never fades. */}

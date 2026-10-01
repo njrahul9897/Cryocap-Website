@@ -9,7 +9,7 @@ import WhereUsedScroll from "@/components/WhereUsedScroll";
 // Unlike the how-it-works headline — two rows that shrink as one block — these four words
 // RE-FLOW from three lines to one, so each word gets its own absolutely positioned centre and
 // is flown to its small-line position independently. Each also keeps its own clip window, so
-// the four still reveal one after another the way "How / does / It / works" does.
+// the four still reveal one after another the way "How / does / It / work" does.
 // 16.67vw is Figma's 320px on the 1920 frame. That same ratio on a phone is only ~7.7% of
 // the viewport HEIGHT (against 26.7% on desktop), which is what left the three rows
 // marooned in white space — so mobile gets a much larger share of the width.
@@ -52,7 +52,7 @@ const words: Word[] = [
     tone: "text-black/10",
     layer: "",
   },
-  // solid black and in FRONT of the mascot, the way "It works" rises over the cap. No
+  // solid black and in FRONT of the mascot, the way "It work" rises over the cap. No
   // `relative` here: these boxes are already absolutely positioned, so z-index applies as-is,
   // and adding `relative` would emit a second `position` that wins and drops the word back
   // into normal flow at full viewport width.

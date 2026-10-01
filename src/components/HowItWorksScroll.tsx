@@ -22,7 +22,7 @@ const CAP_PARK_CLEARANCE_VH = 0.02;
 
 // Row clip-window height in phase 1 is the literal `h-[13.46vw]` class on each row.
 const BIG_ROW_VW = 0.1346;
-// How much the headline shrinks by. Figma's small "How does"/"it works" rows are 11.2% of the
+// How much the headline shrinks by. Figma's small "How does"/"it work" rows are 11.2% of the
 // 1080-tall frame against a big row that is 13.46% of its 1920 width, so the shrink is that
 // pair's ratio — a CONSTANT, not something to recompute per viewport. Deriving it live from
 // `vh/vw` made the shrunk headline drift with aspect ratio (0.447 at 1512x812 but 0.521 at
@@ -30,7 +30,7 @@ const BIG_ROW_VW = 0.1346;
 // The ROW/GRID gaps below replace Figma's literal (near-top, bottom-anchored-grid) placement
 // with the whole block centred on the viewport, per explicit direction.
 const TEXT_SHRINK = (0.112 * 1080) / (BIG_ROW_VW * 1920);
-// Gap between the two shrunk headline rows' visual edges, and between "It works" and the grid
+// Gap between the two shrunk headline rows' visual edges, and between "It work" and the grid
 // below it — both as a fraction of viewport height, so they scale with the viewport like
 // everything else in this section.
 const ROW_GAP_VH = 0.02;
