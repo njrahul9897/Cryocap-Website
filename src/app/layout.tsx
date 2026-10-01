@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
+import { ContactModalProvider } from "@/components/ContactModal";
 import Header from "@/components/Header";
 import BottomBar from "@/components/BottomBar";
 import "./globals.css";
@@ -39,11 +40,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: NO_SCROLL_RESTORE }} />
-        <SmoothScroll>
-          <Header />
-          {children}
-          <BottomBar />
-        </SmoothScroll>
+        <ContactModalProvider>
+          <SmoothScroll>
+            <Header />
+            {children}
+            <BottomBar />
+          </SmoothScroll>
+        </ContactModalProvider>
       </body>
     </html>
   );

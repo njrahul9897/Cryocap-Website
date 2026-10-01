@@ -4,11 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getLenis } from "@/lib/lenis-store";
+import { useContactModal } from "@/components/ContactModal";
 
 const dots = Array.from({ length: 9 });
 
 export default function Header() {
   const pathname = usePathname();
+  const { openContactModal } = useContactModal();
 
   // On the home page the logo should just take you back to the hero (scroll to
   // top) rather than re-triggering navigation — the intro reveal only ever
@@ -32,15 +34,16 @@ export default function Header() {
       </Link>
 
       <div className="flex items-center gap-4 md:gap-[clamp(20px,1.875vw,36px)]">
-        <Link
-          href="/contact"
+        <button
+          type="button"
+          onClick={openContactModal}
           className="inline-flex items-center gap-[clamp(7px,0.52vw,10px)] rounded-full border border-ink bg-white px-[clamp(10px,1.04vw,20px)] py-[clamp(9px,0.625vw,12px)] text-[clamp(13px,0.833vw,16px)] font-medium leading-none text-ink transition-colors hover:bg-surface"
         >
           <span className="relative size-[clamp(20px,1.354vw,26px)] shrink-0">
             <Image src="/icons/phone.svg" alt="" fill sizes="26px" />
           </span>
           <span className="hidden sm:inline">Contact Us</span>
-        </Link>
+        </button>
 
         <button
           type="button"

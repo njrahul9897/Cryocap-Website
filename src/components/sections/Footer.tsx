@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Button from "@/components/ui/Button";
+import ContactButton from "@/components/ContactButton";
 import FooterScroll from "@/components/FooterScroll";
 
 // Figma frames 18 -> 19, the closing panel. It deliberately echoes the hero: the same giant
@@ -112,14 +113,11 @@ export default function Footer() {
         className="invisible absolute inset-x-0 top-[12.59dvh] z-30 flex flex-col items-center gap-[2.604vw] px-gutter opacity-0"
       >
         <p className="w-[47.45vw] text-center text-[2.604vw] leading-normal text-ink max-lg:w-full max-lg:text-[5vw]">
-          Smart <strong className="font-extrabold">Monitoring</strong>, Better{" "}
-          <strong className="font-extrabold">Breeding</strong>, Stronger{" "}
-          <strong className="font-extrabold">Future.</strong>
+          Every straw <strong className="font-extrabold">protected</strong>. Every heat cycle{" "}
+          <strong className="font-extrabold">counts</strong>.
         </p>
         <div className="flex gap-4">
-          <Button variant="outline" icon="/icons/play.svg" className="w-[clamp(130px,8.75vw,168px)]">
-            How it works
-          </Button>
+          <ContactButton className="w-[clamp(130px,8.75vw,168px)]" />
           <Button href="/buy" icon="/icons/cart.svg" className="w-[clamp(130px,8.75vw,168px)]">
             Book a demo
           </Button>
