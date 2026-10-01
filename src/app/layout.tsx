@@ -23,10 +23,22 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+// Runs while the HTML is still parsing — before any bundle, and before the browser restores a
+// scroll position. Both matter here. This page is a chain of pinned, scroll-scrubbed sections
+// whose triggers are rebuilt from nothing on every load, so a restored offset drops the document
+// at a position that belongs to a layout which does not exist yet: parts of other sections paint
+// behind the intro, and the moment the intro releases `overflow` the browser applies the pending
+// restore and the page jumps to wherever it was left. It has to be done HERE and not in an
+// effect: `scrollRestoration` belongs to the document, resets to "auto" on every navigation, and
+// is consulted before React has run at all, so setting it from the previous document does
+// nothing for the reload.
+const NO_SCROLL_RESTORE = "try{history.scrollRestoration='manual'}catch(e){}";
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: NO_SCROLL_RESTORE }} />
         <SmoothScroll>
           <Header />
           {children}

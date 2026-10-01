@@ -21,7 +21,7 @@ export default function Header() {
   };
 
   return (
-    <header data-intro="chrome" className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-gutter pt-[clamp(1.25rem,2.5vw,2.5rem)]">
+    <header data-intro="chrome" className="invisible fixed inset-x-0 top-0 z-50 opacity-0 flex items-center justify-between px-gutter pt-[clamp(1.25rem,2.5vw,2.5rem)]">
       <Link
         href="/"
         aria-label="Cryocap home"

@@ -95,7 +95,11 @@ export default function HowItWorks() {
           came, leaving the frame before the steps below arrive; it never fades. */}
       <div
         data-howitworks-cap
-        className="pointer-events-none absolute top-1/2 left-1/2 z-10 h-[31dvh] lg:h-[min(62.05dvh,34.9vw)]"
+        // invisible/opacity-0: HowItWorksScroll parks this below the fold with a GSAP transform
+        // and turns it visible in the same call. Without a hidden resting state in CSS the cap
+        // paints dead centre of the section until that runs — and again for a frame whenever the
+        // timeline is reverted and rebuilt on a resize.
+        className="invisible pointer-events-none absolute top-1/2 left-1/2 z-10 h-[31dvh] opacity-0 lg:h-[min(62.05dvh,34.9vw)]"
       >
         <div className="relative h-full aspect-[478/1100]">
           <Image src="/product/cap-probe.png" alt="Cryocap smart cap and its probe" fill sizes="(min-width: 1024px) 16vw, 40vw" className="object-contain" />

@@ -58,7 +58,7 @@ export default function Footer() {
           +19dvh to the grey fade. */}
       <div
         data-footer-mark
-        className="pointer-events-none absolute inset-x-0 z-0 flex justify-center max-lg:top-[49.7dvh] lg:top-[25.65dvh]"
+        className="invisible pointer-events-none absolute inset-x-0 z-0 flex justify-center opacity-0 max-lg:top-[49.7dvh] lg:top-[25.65dvh]"
       >
         <p className="relative bg-linear-to-b from-ink from-52% to-[#666] to-80% bg-clip-text font-extrabold leading-[1.26] whitespace-nowrap text-transparent max-lg:text-[max(3.5rem,min(18.3vw,37.96dvh))] lg:text-[min(21.35vw,37.96dvh)]">
           Cryocap
@@ -93,7 +93,7 @@ export default function Footer() {
           can's edges if the two scale off the same axis. */}
       <div
         data-footer-can
-        className="pointer-events-none absolute z-20 -translate-x-1/2 max-lg:top-[63dvh] max-lg:left-1/2 max-lg:w-[61.5vw] lg:top-[57.5dvh] lg:left-[49.45vw] lg:w-[21.3vw]"
+        className="invisible pointer-events-none absolute z-20 -translate-x-1/2 opacity-0 max-lg:top-[63dvh] max-lg:left-1/2 max-lg:w-[61.5vw] lg:top-[57.5dvh] lg:left-[49.45vw] lg:w-[21.3vw]"
       >
         <div className="relative w-full aspect-[409/844]">
           <Image
@@ -109,7 +109,7 @@ export default function Footer() {
       {/* Sign-off and the same CTA pair the hero carries. */}
       <div
         data-footer-copy
-        className="absolute inset-x-0 top-[12.59dvh] z-30 flex flex-col items-center gap-[2.604vw] px-gutter"
+        className="invisible absolute inset-x-0 top-[12.59dvh] z-30 flex flex-col items-center gap-[2.604vw] px-gutter opacity-0"
       >
         <p className="w-[47.45vw] text-center text-[2.604vw] leading-normal text-ink max-lg:w-full max-lg:text-[5vw]">
           Smart <strong className="font-extrabold">Monitoring</strong>, Better{" "}
@@ -140,7 +140,7 @@ export default function Footer() {
           data-footer-copy and so gets a GSAP `y` on arrival. */}
       <div
         data-footer-copy
-        className="pointer-events-none absolute inset-x-0 top-[35.5dvh] z-30 mx-auto size-[28vw] lg:hidden"
+        className="invisible pointer-events-none absolute inset-x-0 top-[35.5dvh] z-30 mx-auto size-[28vw] opacity-0 lg:hidden"
       >
         <Image src="/brand/patented-badge.png" alt="Patented — Intellectual Property" fill sizes="110px" />
       </div>
@@ -178,7 +178,7 @@ export default function Footer() {
       {/* Figma swaps the global bar's "Scroll Down" cluster for the copyright down here. */}
       <div
         data-footer-copy
-        className="absolute right-gutter bottom-[2.96dvh] z-40 text-[clamp(12px,0.833vw,16px)] leading-none text-ink"
+        className="invisible absolute right-gutter bottom-[2.96dvh] z-40 text-[clamp(12px,0.833vw,16px)] leading-none text-ink opacity-0"
       >
         © 2026 Cryocap
       </div>

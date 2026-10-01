@@ -1,6 +1,8 @@
 "use client";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useViewportKey } from "@/lib/use-viewport-key";
+import { largeViewportHeight } from "@/lib/viewport";
 
 // Scroll distance the whole section stays pinned for, across three beats:
 //   1. the headline reveals word by word and the cap rises into it
@@ -56,6 +58,8 @@ const PHASE_2_DUR = 0.8;
 const PHASE_3 = PHASE_2 + PHASE_2_DUR;
 
 export default function HowItWorksScroll() {
+  const viewport = useViewportKey();
+
   useGSAP(() => {
     const section = document.querySelector<HTMLElement>("[data-howitworks]");
     if (!section) return;
@@ -79,7 +83,14 @@ export default function HowItWorksScroll() {
     // is short of that here: the design lands the cap at 0.634vh, this build centers it at 0.5vh
     // per the centered composition, and reusing the design's travel against a different landing
     // point left ~92px of the cap permanently visible at the bottom edge before it set off.
-    const capParkY = vh / 2 + (cap.offsetHeight * CAP_PARKED.scale) / 2 + CAP_PARK_CLEARANCE_VH * vh;
+    // Parked against the LARGE viewport, not the current one. On a phone the URL bar retracts on
+    // the first scroll; this section is `h-dvh` and the cap is `h-[31dvh]`, so both grow, but a
+    // park measured beforehand does not — leaving a sliver of the cap showing along the bottom
+    // edge. Sizing the park for the biggest the viewport can get clears it in either state, and
+    // on desktop lvh === dvh so the number is unchanged.
+    const lvh = largeViewportHeight();
+    const grow = Math.max(1, lvh / vh);
+    const capParkY = lvh / 2 + (cap.offsetHeight * grow * CAP_PARKED.scale) / 2 + CAP_PARK_CLEARANCE_VH * lvh;
 
     // xPercent/yPercent, NOT `-translate-x-1/2 -translate-y-1/2` in the markup. Tailwind v4
     // emits those as the standalone `translate` property, and GSAP discards that property on
@@ -93,6 +104,9 @@ export default function HowItWorksScroll() {
       y: capParkY,
       scale: CAP_PARKED.scale,
       rotation: CAP_PARKED.rotation,
+      // the markup paints it hidden (see the `opacity-0` on the element) so that it cannot show
+      // up mid-section before this runs, or in the instant between a revert and a rebuild
+      autoAlpha: 1,
     });
     gsap.set(gridItems, { y: 30, autoAlpha: 0 });
 
@@ -163,7 +177,7 @@ export default function HowItWorksScroll() {
     tl.to(gridItems, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.16 }, PHASE_3);
 
     ScrollTrigger.refresh();
-  }, []);
+  }, { dependencies: [viewport], revertOnUpdate: true });
 
   return null;
 }

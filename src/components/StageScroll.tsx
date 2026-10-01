@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useViewportKey } from "@/lib/use-viewport-key";
 
 export const INTRO_DONE_EVENT = "cryocap:intro-done";
 
@@ -18,7 +19,7 @@ const TOTAL = 26;
 
 export default function StageScroll() {
   const [ready, setReady] = useState(false);
-  const built = useRef(false);
+  const viewport = useViewportKey();
 
   useEffect(() => {
     const go = () => setReady(true);
@@ -29,8 +30,9 @@ export default function StageScroll() {
 
   useGSAP(
     () => {
-      if (!ready || built.current) return;
-      built.current = true;
+      // No `built` latch any more: this has to be free to run again, because `revertOnUpdate`
+      // tears the whole timeline down and rebuilds it whenever the viewport changes size.
+      if (!ready) return;
 
       const stage = document.querySelector<HTMLElement>("[data-stage]")!;
       const q = (sel: string) => Array.from(stage.querySelectorAll<HTMLElement>(sel));
@@ -216,7 +218,7 @@ export default function StageScroll() {
 
       ScrollTrigger.refresh();
     },
-    { dependencies: [ready] },
+    { dependencies: [ready, viewport], revertOnUpdate: true },
   );
 
   return null;

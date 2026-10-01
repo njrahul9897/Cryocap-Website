@@ -21,7 +21,7 @@ export default function BottomBar() {
   return (
     <div
       data-intro="chrome"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex items-end justify-between px-gutter text-[clamp(12px,0.833vw,16px)] leading-none"
+      className="invisible pointer-events-none fixed inset-x-0 bottom-0 z-40 flex items-end justify-between px-gutter text-[clamp(12px,0.833vw,16px)] leading-none opacity-0"
       style={{ paddingBottom: BOTTOM_INSET }}
     >
       {/* Stacked on a phone — side by side there crowded the wordmark's left edge. */}

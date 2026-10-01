@@ -57,8 +57,28 @@ export default function IntroReveal() {
         document.documentElement.dataset.introDone = "1";
         window.dispatchEvent(new Event(INTRO_DONE_EVENT));
       };
+      // Selector strings would be scoped to `root`; these live in the page outside it.
+      const pick = (kind: string) => Array.from(document.querySelectorAll<HTMLElement>(`[data-intro='${kind}']`));
+      const fade = pick("fade");
+      const chrome = pick("chrome");
+      const rise = pick("rise");
+      const grid = document.querySelector<HTMLElement>("[data-hero='grid']");
+
+      // Everything this reveals now rests HIDDEN in its own markup, so that none of it can paint
+      // in place for the moment before this effect runs. That makes an explicit settled state
+      // necessary for the path where there is no intro to reveal it — a client-side return to
+      // the page, or prefers-reduced-motion. The xPercent matters as much as the opacity here:
+      // the can is centred by GSAP rather than by a `-translate-x-1/2` class, so skipping the
+      // intro used to leave it sitting half its own width right of centre.
+      const settle = () => {
+        gsap.set([...fade, ...chrome], { autoAlpha: 1, y: 0 });
+        gsap.set(rise, { xPercent: -50, yPercent: 0, x: 0, rotation: 0, autoAlpha: 1 });
+        if (grid) gsap.set(grid, { yPercent: 0 });
+      };
+
       if (shouldSkip()) {
         el.style.display = "none";
+        settle();
         done();
         return;
       }
@@ -67,11 +87,6 @@ export default function IntroReveal() {
       html.style.overflow = "hidden";
       window.scrollTo(0, 0);
 
-      // Selector strings would be scoped to `root`; these live in the page outside it.
-      const pick = (kind: string) => Array.from(document.querySelectorAll<HTMLElement>(`[data-intro='${kind}']`));
-      const fade = pick("fade");
-      const chrome = pick("chrome");
-      const rise = pick("rise");
       gsap.set(chrome, { autoAlpha: 0 });
       gsap.set(fade, { autoAlpha: 0, y: T.heroFade.fromY * window.innerHeight });
       // xPercent, NOT a `-translate-x-1/2` class. Tailwind v4 emits that as the standalone
@@ -88,7 +103,6 @@ export default function IntroReveal() {
       });
 
       const whiteFade = document.querySelector<HTMLElement>("[data-hero='white-fade']");
-      const grid = document.querySelector<HTMLElement>("[data-hero='grid']");
       // The frost rests at a different height on each breakpoint, because the wordmark it fades
       // does. Leaving `top` to the responsive class and animating only the offset keeps that
       // difference in CSS where it belongs.

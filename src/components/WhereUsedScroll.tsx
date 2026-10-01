@@ -1,6 +1,8 @@
 "use client";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useViewportKey } from "@/lib/use-viewport-key";
+import { largeViewportHeight } from "@/lib/viewport";
 
 // Scroll distance the section stays pinned for, across three beats:
 //   1. the four words reveal one by one and the mascot rises through them
@@ -38,6 +40,8 @@ const PHASE_3 = PHASE_2 + PHASE_2_DUR;
 const STRIP_DUR = 4.5;
 
 export default function WhereUsedScroll() {
+  const viewport = useViewportKey();
+
   useGSAP(() => {
     const section = document.querySelector<HTMLElement>("[data-whereused]");
     if (!section) return;
@@ -70,12 +74,21 @@ export default function WhereUsedScroll() {
 
     // Parking the mascot fully below the fold: its scaled top edge has to clear the viewport
     // bottom, which is a viewport plus half its own scaled height, less where it already sits.
+    // Against the LARGE viewport for the same reason as the how-it-works cap: the mascot's own
+    // `top` and height are in dvh, so a park measured while the phone's URL bar is still showing
+    // is short by the time it retracts, and the top of its head appears at the bottom edge.
+    // Expressed as a fraction of the viewport so it holds at either height; on desktop lvh ===
+    // dvh and this works out to exactly the number it did before.
+    const lvh = largeViewportHeight();
+    const grow = Math.max(1, lvh / vh);
+    const figureTopFraction = centerOf(figure).cy / vh;
     const figureTravel =
-      vh * (1 + FIGURE_PARK_CLEARANCE_VH) -
-      centerOf(figure).cy +
-      (figure.offsetHeight * FIGURE_PARKED_SCALE) / 2;
+      lvh * (1 - figureTopFraction + FIGURE_PARK_CLEARANCE_VH) +
+      (figure.offsetHeight * grow * FIGURE_PARKED_SCALE) / 2;
 
-    gsap.set(figure, { y: figureTravel, scale: FIGURE_PARKED_SCALE });
+    // autoAlpha: the mascot is painted hidden in the markup so it cannot appear parked in the
+    // middle of the section before this runs, or between a revert and a rebuild
+    gsap.set(figure, { y: figureTravel, scale: FIGURE_PARKED_SCALE, autoAlpha: 1 });
 
     // The small line, measured rather than tabulated: take each word at its rendered width,
     // lay the four out left to right with one constant gap, and centre the run on the viewport.
@@ -155,7 +168,7 @@ export default function WhereUsedScroll() {
     );
 
     ScrollTrigger.refresh();
-  }, []);
+  }, { dependencies: [viewport], revertOnUpdate: true });
 
   return null;
 }

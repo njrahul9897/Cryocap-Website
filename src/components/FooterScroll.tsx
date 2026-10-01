@@ -1,6 +1,7 @@
 "use client";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { useViewportKey } from "@/lib/use-viewport-key";
 
 // Two separate behaviours, because Figma frames 18 -> 19 are two different moments:
 //
@@ -16,6 +17,8 @@ import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 const CAN_RISE_VH = 1;
 
 export default function FooterScroll() {
+  const viewport = useViewportKey();
+
   useGSAP(() => {
     const section = document.querySelector<HTMLElement>("[data-footer]");
     if (!section) return;
@@ -29,7 +32,9 @@ export default function FooterScroll() {
 
     const vh = window.innerHeight;
 
-    gsap.set(can, { y: CAN_RISE_VH * vh });
+    // autoAlpha: the can is painted hidden in the markup, so it cannot sit in the footer
+    // fully visible before this runs, or between a revert and a rebuild
+    gsap.set(can, { y: CAN_RISE_VH * vh, autoAlpha: 1 });
     gsap.set(copy, { y: 24, autoAlpha: 0 });
     if (mark) gsap.set(mark, { autoAlpha: 0 });
 
@@ -89,7 +94,7 @@ export default function FooterScroll() {
     }
 
     ScrollTrigger.refresh();
-  }, []);
+  }, { dependencies: [viewport], revertOnUpdate: true });
 
   return null;
 }

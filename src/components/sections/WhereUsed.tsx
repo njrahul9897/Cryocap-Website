@@ -115,7 +115,10 @@ export default function WhereUsed() {
           collapses — it never fades, matching the cap in the how-it-works section. */}
       <div
         data-whereused-figure
-        className="pointer-events-none absolute top-[50dvh] left-1/2 z-10 h-[52dvh] lg:top-[52.27vh] lg:h-[min(71.39dvh,40.2vw)]"
+        // invisible/opacity-0 for the same reason as the how-it-works cap: WhereUsedScroll parks
+        // it below the fold and reveals it in the same call, so it needs a hidden resting state
+        // in CSS for the window before that runs — and after a revert on resize.
+        className="invisible pointer-events-none absolute top-[50dvh] left-1/2 z-10 h-[52dvh] opacity-0 lg:top-[52.27vh] lg:h-[min(71.39dvh,40.2vw)]"
       >
         <div className="relative h-full aspect-[444/771]">
           <Image
