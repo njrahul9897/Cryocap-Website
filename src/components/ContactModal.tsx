@@ -83,14 +83,19 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
         className="m-auto max-h-[90dvh] w-[min(92vw,480px)] overflow-y-auto rounded-[clamp(18px,1.458vw,28px)] bg-white p-0 backdrop:bg-ink/40"
       >
         <div className="relative p-[clamp(24px,2.6vw,48px)]">
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={close}
-            className="absolute right-[clamp(14px,1.56vw,30px)] top-[clamp(14px,1.56vw,30px)] text-[1.5rem] leading-none text-muted transition-colors hover:text-ink"
-          >
-            ×
-          </button>
+          {/* Only the form phase gets the × — the success phase has its own "Close" button
+              below the message, so a second, redundant way to dismiss it right above would be
+              pure clutter there. */}
+          {phase === "form" && (
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={close}
+              className="absolute right-[clamp(14px,1.56vw,30px)] top-[clamp(14px,1.56vw,30px)] text-[1.5rem] leading-none text-muted transition-colors hover:text-ink"
+            >
+              ×
+            </button>
+          )}
 
           {phase === "form" ? (
             <>
@@ -113,14 +118,32 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
             </>
           ) : (
             <div className="flex flex-col items-center gap-[clamp(14px,1.25vw,20px)] py-[clamp(10px,1.04vw,16px)] text-center">
-              <span className="flex size-[clamp(44px,3.65vw,56px)] items-center justify-center rounded-full bg-surface text-accent">
+              {/* Pops in, then the check draws itself along its own path — keyframes in
+                  globals.css, since Tailwind has no utility for animating stroke-dashoffset. */}
+              <span className="flex size-[clamp(48px,4.17vw,64px)] items-center justify-center rounded-full bg-surface text-accent [animation:contact-success-pop_0.45s_ease-out]">
                 <svg viewBox="0 0 24 24" fill="none" className="size-[55%]" aria-hidden="true">
-                  <path d="M5 13l4 4L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M5 13l4 4L19 7"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ strokeDasharray: 20, strokeDashoffset: 20 }}
+                    className="[animation:contact-success-check_0.4s_0.3s_ease-out_forwards]"
+                  />
                 </svg>
               </span>
-              <p id="contact-modal-heading" className="text-[clamp(16px,1.25vw,20px)] font-semibold leading-snug text-ink">
-                Thank you for reaching out to us. Our team will get back to you shortly.
-              </p>
+              <div className="flex flex-col gap-[clamp(4px,0.417vw,8px)]">
+                {/* Sized to hold this exact sentence on one line inside the panel (measured via
+                    canvas text metrics against the panel's actual inner width) — the original
+                    heading size wrapped it as "...reaching out to / us.", orphaning two words. */}
+                <h2 id="contact-modal-heading" className="text-[clamp(16px,1.2vw,22px)] font-extrabold leading-snug text-ink">
+                  Thank you for reaching out to us.
+                </h2>
+                <p className="text-[clamp(12px,0.9vw,15px)] font-normal text-muted">
+                  Our team will get back to you shortly.
+                </p>
+              </div>
               <Button onClick={close} variant="outline" className="mt-[clamp(4px,0.52vw,8px)]">
                 Close
               </Button>

@@ -14,6 +14,34 @@ html {
   color-scheme: light;
 }
 
+/* Contact modal's success icon: the circle pops in with a slight overshoot, then the check
+   draws itself along its own path. The path is ~20 units long (measured roughly off its own
+   "M5 13l4 4L19 7" coordinates), so the dasharray/dashoffset pair below is set to that round
+   number rather than computed at runtime via getTotalLength() — this is a fixed, never-reused
+   path, not something that needs to stay accurate for arbitrary SVG content. */
+@keyframes contact-success-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes contact-success-check {
+  from {
+    stroke-dashoffset: 20;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 html.lenis,
 html.lenis body {
   height: auto;
