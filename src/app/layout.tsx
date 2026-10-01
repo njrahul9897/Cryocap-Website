@@ -53,6 +53,20 @@ try{history.scrollRestoration='manual'}catch(e){}
     if(e.cancelable){e.preventDefault()}
   };
   document.addEventListener('touchmove',block,{passive:false,capture:true});
+  // Last line of defence, and the only one that does not care HOW the page moved. Cancelling
+  // touchmove assumes the scroll came from a finger this listener saw; this one just notices
+  // the document is off the top while the intro is still up and puts it back, which also
+  // covers a restored scroll position, a bfcache restore and any gesture the touch handler
+  // never sees. Cheap, because nothing should be scrolling during the intro anyway.
+  var pin=function(){
+    if(!html.hasAttribute('data-intro-pending')){
+      window.removeEventListener('scroll',pin);
+      return;
+    }
+    if(window.scrollY!==0||window.pageYOffset!==0){window.scrollTo(0,0)}
+  };
+  window.addEventListener('scroll',pin,{passive:true});
+  pin();
 })();
 `;
 
