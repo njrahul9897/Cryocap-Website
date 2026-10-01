@@ -53,8 +53,17 @@ export default function IntroReveal() {
   useGSAP(
     () => {
       const el = root.current!;
+      const html = document.documentElement;
+      // The scroll lock ships in the server-rendered markup (RootLayout's data-intro-pending,
+      // and the rule it drives in globals.css) instead of being applied here, so all this has
+      // to do is let go of it. A lock applied from an effect does not exist until hydration,
+      // which is seconds away on a mid-range phone — long enough to scroll the whole page out
+      // from under the intro. Every exit path runs through done(), so unlocking here covers
+      // the reduced-motion skip as well as the finished timeline.
+      const unlock = () => html.removeAttribute("data-intro-pending");
       const done = () => {
-        document.documentElement.dataset.introDone = "1";
+        unlock();
+        html.dataset.introDone = "1";
         window.dispatchEvent(new Event(INTRO_DONE_EVENT));
       };
       // Selector strings would be scoped to `root`; these live in the page outside it.
@@ -83,9 +92,11 @@ export default function IntroReveal() {
         return;
       }
 
-      const html = document.documentElement;
-      html.style.overflow = "hidden";
       window.scrollTo(0, 0);
+      // Re-assert the lock rather than assuming the markup's copy survived. The cleanup below
+      // releases it, and React remounts this effect on every StrictMode pass — without this the
+      // first cleanup drops the lock for good and the intro plays over a scrollable page.
+      html.setAttribute("data-intro-pending", "");
 
       gsap.set(chrome, { autoAlpha: 0 });
       gsap.set(fade, { autoAlpha: 0, y: T.heroFade.fromY * window.innerHeight });
@@ -121,7 +132,6 @@ export default function IntroReveal() {
       const tl = gsap.timeline({
         onComplete: () => {
           el.style.display = "none";
-          html.style.overflow = "";
           getLenis()?.start();
           played = true;
           done();
@@ -154,7 +164,7 @@ export default function IntroReveal() {
       if (grid) tl.to(grid, { yPercent: 0, duration: T.settle.gridDur, ease: "power2.out" }, T.settle.at);
 
       return () => {
-        html.style.overflow = "";
+        unlock();
         getLenis()?.start();
       };
     },

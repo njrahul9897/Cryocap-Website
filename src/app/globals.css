@@ -59,6 +59,22 @@ html.lenis body {
   overflow: hidden;
 }
 
+/* The intro's scroll lock. It is keyed off an attribute the server already renders, rather
+   than being applied from an effect: hydration can be several seconds away on a mid-range
+   phone over a slow link, and for all of that time an effect-applied lock does not exist —
+   the page scrolls freely behind the intro, so the bars open onto "How it works" instead of
+   the hero. `overflow` alone also does not hold on iOS Safari, where the body keeps panning
+   underneath it; touch-action is what actually stops a finger there. The second declaration
+   wins where it is understood, keeping pinch-zoom available to anyone who needs it, and
+   browsers that do not know the value fall back to the `none` above. */
+html[data-intro-pending],
+html[data-intro-pending] body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  touch-action: pinch-zoom;
+}
+
 /* Figma "Grid Layer": 100px cells in the 1920x1080 frame, lines fading in toward the bottom */
 .grid-lines {
   --cell: 5.208vw;
@@ -118,6 +134,22 @@ body {
 
 .lenis.lenis-stopped {
   overflow: hidden;
+}
+
+/* The intro's scroll lock. It is keyed off an attribute the server already renders, rather
+   than being applied from an effect: hydration can be several seconds away on a mid-range
+   phone over a slow link, and for all of that time an effect-applied lock does not exist —
+   the page scrolls freely behind the intro, so the bars open onto "How it works" instead of
+   the hero. `overflow` alone also does not hold on iOS Safari, where the body keeps panning
+   underneath it; touch-action is what actually stops a finger there. The second declaration
+   wins where it is understood, keeping pinch-zoom available to anyone who needs it, and
+   browsers that do not know the value fall back to the `none` above. */
+html[data-intro-pending],
+html[data-intro-pending] body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  touch-action: pinch-zoom;
 }
 
 /* Figma "Grid Layer": 100px cells in the 1920x1080 frame, lines fading in toward the bottom */

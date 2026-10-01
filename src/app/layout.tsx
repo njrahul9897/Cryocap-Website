@@ -37,9 +37,17 @@ const NO_SCROLL_RESTORE = "try{history.scrollRestoration='manual'}catch(e){}";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${jakarta.variable} h-full antialiased`}>
+    // data-intro-pending holds the page still until IntroReveal takes it off. It ships in the
+    // markup so the lock exists from the first paint rather than from hydration — see the rule
+    // it drives in globals.css.
+    <html lang="en" data-intro-pending="" className={`${jakarta.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <script dangerouslySetInnerHTML={{ __html: NO_SCROLL_RESTORE }} />
+        {/* With JS off there is no intro, and nothing ever runs to release the lock, so it has
+            to let go on its own rather than leaving the page unscrollable. */}
+        <noscript>
+          <style>{`html[data-intro-pending],html[data-intro-pending] body{overflow:visible;touch-action:auto}`}</style>
+        </noscript>
         <ContactModalProvider>
           <SmoothScroll>
             <Header />
