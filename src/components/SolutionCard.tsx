@@ -30,6 +30,10 @@ export default function SolutionCard({ icon, title, badge, description }: Props)
       className="rounded-[clamp(18px,1.458vw,28px)] bg-linear-to-r from-[rgba(230,230,230,0.36)] to-[rgba(0,0,0,0.06)] p-[clamp(8px,0.729vw,14px)] shadow-[0_4px_16px_rgba(0,0,0,0.04),0_24px_48px_-12px_rgba(0,0,0,0.12)]"
     >
       <div className="flex flex-col gap-[clamp(9px,0.781vw,15px)] rounded-[clamp(10px,0.833vw,16px)] bg-white px-[clamp(16px,1.354vw,26px)] py-[clamp(13px,1.042vw,20px)]">
+        {/* No flex-wrap here on purpose: the longer titles ("Temperature checked every 30
+            seconds") outrun the row, and wrapping the row drops the pill onto its own line,
+            which breaks the rhythm against the shorter cards. The title group carries min-w-0
+            instead, so the heading shrinks and wraps while the pill stays anchored right. */}
         <div className="flex items-center justify-between gap-[clamp(10px,0.833vw,16px)]">
           <div className="flex min-w-0 items-center gap-[clamp(9px,0.781vw,15px)]">
             <span className={`relative size-[clamp(24px,1.875vw,36px)] shrink-0 ${ICON_SCALE[icon] ?? ""}`}>
@@ -37,7 +41,7 @@ export default function SolutionCard({ icon, title, badge, description }: Props)
                   stretched it to fill this square box, making it look oversized and squeezed */}
               <Image src={icon} alt="" fill sizes="36px" className="object-contain" />
             </span>
-            <h3 className="truncate text-[clamp(16px,1.25vw,24px)] font-semibold leading-tight">{title}</h3>
+            <h3 className="text-[clamp(16px,1.25vw,24px)] font-semibold leading-tight text-balance">{title}</h3>
           </div>
 
           <span className="inline-flex shrink-0 items-center gap-[clamp(6px,0.52vw,10px)] rounded-full bg-surface px-[clamp(10px,0.833vw,16px)] py-[clamp(8px,0.625vw,12px)] text-[clamp(11px,0.78vw,15px)] leading-none">

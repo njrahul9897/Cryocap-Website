@@ -5,46 +5,43 @@ import SolutionCard from "@/components/SolutionCard";
 // giant ghost wordmark slides up from the bottom the same way the "problems" label does.
 const solutions = [
   {
-    icon: "/icons/temperature-snow.svg",
-    title: "Real-time Monitoring",
-    badge: "Live Data",
-    description:
-      "Continuously tracks nitrogen level and temperature inside the container, giving instant visibility instead of periodic manual checks. This ensures any deviation from safe storage conditions is caught the moment it happens.",
-  },
-  {
     icon: "/icons/water-drop.svg",
-    title: "Leakage Detection",
-    badge: "Avoid Risk",
-    description:
-      "Identifies abnormal drops in nitrogen level that indicate a leak, distinguishing it from normal boil-off patterns. Early detection prevents unnoticed wastage and protects stored samples from temperature risk.",
-  },
-  {
-    icon: "/icons/location.svg",
-    title: "Location Tracking",
-    badge: "Live Location",
-    description:
-      "Enables real-time tracking of the container’s location, useful for containers in transit or deployed across multiple field sites. This ensures accountability and quick retrieval in case of misplacement or theft.",
+    title: "Live nitrogen level",
+    badge: "Live Data",
+    description: "Sensors track the LN₂ level 24×7, so you always know what’s left.",
   },
   {
     icon: "/icons/mobile.svg",
-    title: "Mobile App Connectivity",
-    badge: "Seamless Connection",
-    description:
-      "Delivers live nitrogen levels, temperature data, and alerts directly to a smartphone, allowing users to monitor containers remotely from anywhere. This eliminates the need for constant physical supervision.",
+    title: "No need to open the can",
+    badge: "Remote Check",
+    description: "Check every can from your phone. The lid stays closed and the cold stays in.",
   },
   {
     icon: "/icons/ai.svg",
-    title: "AI Based Insights",
-    badge: "Artificial Intelligence",
+    title: "Refills planned, wherever the can is",
+    badge: "AI + Location",
     description:
-      "Analyzes usage patterns and historical data to predict nitrogen depletion trends and recommend optimal refill schedules. This helps prevent unexpected shortages and optimizes nitrogen consumption over time.",
+      "The AI learns each can’s evaporation rate and predicts the next refill. Live location tracks every can on the road.",
   },
   {
-    icon: "/icons/water-drop.svg",
-    title: "Low Nitrogen Alerts",
-    badge: "Notification",
+    icon: "/icons/temperature-snow.svg",
+    title: "Temperature checked every 30 seconds",
+    badge: "Temperature",
+    description: "Any warming shows up in the app straight away.",
+  },
+  {
+    icon: "/icons/bell.svg",
+    title: "Alerts before it’s too late",
+    badge: "Instant Alerts",
     description:
-      "Sends instant notifications when nitrogen levels fall below a safe threshold, prompting timely refilling before quality is compromised. This proactive alerting removes the guesswork and risk of running out unnoticed.",
+      "Instant alerts on your phone when nitrogen runs low or the temperature drifts.",
+  },
+  {
+    icon: "/icons/temperature.svg",
+    title: "Every straw protected, with proof",
+    badge: "Cold Chain Proof",
+    description:
+      "Automatic temperature logs show the cold chain held, from semen station to village.",
   },
 ];
 
