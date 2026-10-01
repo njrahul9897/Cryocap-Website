@@ -74,9 +74,18 @@ export default function Hero() {
           </div>
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 top-[49dvh] z-10 h-[45dvh] bg-linear-to-b from-white/0 to-surface to-68% lg:top-[55.7dvh] lg:h-[44.3dvh]" />
+        {/* top + height has to land on exactly 100dvh or the grey stops short and the page
+            goes white again underneath it — on a phone that edge fell across the patented
+            emblem. Desktop pairs to 100 (55.7 + 44.3); mobile now does too (49 + 51). */}
+        <div className="pointer-events-none absolute inset-x-0 top-[49dvh] z-10 h-[51dvh] bg-linear-to-b from-white/0 to-surface to-68% lg:top-[55.7dvh] lg:h-[44.3dvh]" />
 
-        <div data-hero="grid" className="pointer-events-none absolute inset-0 z-10 translate-y-full">
+        {/* invisible/opacity-0, NOT `translate-y-full`, for the pre-JS resting state. Every
+            other parked element here uses the class for its offset and has GSAP tween yPercent
+            to -100 to cancel it — but IntroReveal drives this one from yPercent 100 to 0, and
+            GSAP folds an existing CSS translate into its own `y` rather than replacing it, so
+            the two stacked to 200% and tweening back to 0 left the grid a full viewport low,
+            permanently off screen. Opacity has no such interaction with the transform. */}
+        <div data-hero="grid" className="invisible pointer-events-none absolute inset-0 z-10 opacity-0">
           <div className="grid-lines absolute inset-0" />
           <div className="absolute inset-x-0 top-[91dvh] h-[0.677vw] bg-[url(/textures/grid-marker.svg)] bg-[length:5.208vw_0.677vw] bg-[position:2.76vw_0] bg-repeat-x" />
         </div>

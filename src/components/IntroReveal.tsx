@@ -73,7 +73,7 @@ export default function IntroReveal() {
       const settle = () => {
         gsap.set([...fade, ...chrome], { autoAlpha: 1, y: 0 });
         gsap.set(rise, { xPercent: -50, yPercent: 0, x: 0, rotation: 0, autoAlpha: 1 });
-        if (grid) gsap.set(grid, { yPercent: 0 });
+        if (grid) gsap.set(grid, { yPercent: 0, autoAlpha: 1 });
       };
 
       if (shouldSkip()) {
@@ -108,7 +108,7 @@ export default function IntroReveal() {
       // difference in CSS where it belongs.
       const fadeFrom = window.innerWidth >= 1024 ? T.settle.fadeFromDesktop : T.settle.fadeFromMobile;
       if (whiteFade) gsap.set(whiteFade, { y: fadeFrom * window.innerHeight });
-      if (grid) gsap.set(grid, { yPercent: 100 });
+      if (grid) gsap.set(grid, { yPercent: 100, autoAlpha: 1 });
 
       const phrases = Array.from(el.querySelectorAll<HTMLElement>("[data-phrase]"));
       const letters = phrases.map((ph) => Array.from(ph.querySelectorAll<HTMLElement>("[data-letter]")));
