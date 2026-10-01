@@ -8,8 +8,26 @@ import FooterScroll from "@/components/FooterScroll";
 // than the pitch. Frame 19 settles there; "made in india / for the world" is still parked
 // below its clip windows at that point and reveals on one last beat of scroll.
 // Geometry is fractions of the 1920x1080 frame, like every other section.
-const BLUR_STEPS = 8;
 const BLUR_MAX_VW = 34 / 19.2;
+// Same split the hero uses: eight bands of backdrop-filter is a real cost on a phone, and at
+// this size three are indistinguishable.
+const BLUR_STEPS_DESKTOP = 8;
+const BLUR_STEPS_MOBILE = 3;
+
+function BlurRamp({ steps }: { steps: number }) {
+  return Array.from({ length: steps }).map((_, i) => {
+    const band = 100 / steps;
+    const blur = (BLUR_MAX_VW * (i + 1)) / steps;
+    const mask = `linear-gradient(to bottom, transparent ${i * band}%, black ${(i + 1) * band}%, black ${(i + 2) * band}%, transparent ${(i + 3) * band}%)`;
+    return (
+      <div
+        key={i}
+        className="absolute inset-0"
+        style={{ backdropFilter: `blur(${blur}vw)`, WebkitBackdropFilter: `blur(${blur}vw)`, maskImage: mask, WebkitMaskImage: mask }}
+      />
+    );
+  });
+}
 
 // Figma splits both lines into three runs so the middle of each — the part that crosses the
 // can behind it — can be white while the rest stays black at 50%. Keeping that split verbatim
@@ -33,14 +51,22 @@ export default function Footer() {
   return (
     <footer data-footer className="relative h-dvh overflow-hidden bg-white">
       {/* Giant ghost wordmark — same size and gradient as the hero's, parked lower (Figma puts
-          its frame at y=277 on the 1080 frame). */}
+          its frame at y=277 on the 1080 frame). The phone takes the hero's own mobile size, so
+          phone size is the one in the mobile design (18.3vw renders "Cryocap" 280px wide on a
+          360 frame, which is what that file shows) — a hair under the hero's own 19vw. The three
+          blocks below it keep the hero's mobile spacing relative to it: +6dvh to the blur,
+          +19dvh to the grey fade. */}
       <div
         data-footer-mark
-        className="pointer-events-none absolute inset-x-0 top-[25.65dvh] z-0 hidden justify-center lg:flex"
+        className="pointer-events-none absolute inset-x-0 z-0 flex justify-center max-lg:top-[49.7dvh] lg:top-[25.65dvh]"
       >
-        <p className="relative bg-linear-to-b from-ink from-52% to-[#666] to-80% bg-clip-text text-[min(21.35vw,37.96dvh)] font-extrabold leading-[1.26] whitespace-nowrap text-transparent">
+        <p className="relative bg-linear-to-b from-ink from-52% to-[#666] to-80% bg-clip-text font-extrabold leading-[1.26] whitespace-nowrap text-transparent max-lg:text-[max(3.5rem,min(18.3vw,37.96dvh))] lg:text-[min(21.35vw,37.96dvh)]">
           Cryocap
-          <span className="absolute top-[2.3em] -right-[0.3em] text-[max(0.875rem,min(2.35vw,4.18dvh))] font-semibold leading-none text-ink">
+          {/* Percentages of this <p>, not `em`, on a phone — exactly the fix the hero's TM
+              needed. `top`/`right` in em resolve against the TM's OWN font-size, which bottoms
+              out on its rem floor while the wordmark keeps shrinking, so the mark slides out of
+              superscript and into the letters. The lg values are the em ones, left untouched. */}
+          <span className="absolute font-semibold leading-none text-ink max-lg:top-[20.1%] max-lg:-right-[0.77%] max-lg:text-[max(0.625rem,0.11em)] lg:top-[2.3em] lg:-right-[0.3em] lg:text-[max(0.875rem,min(2.35vw,4.18dvh))]">
             TM
           </span>
         </p>
@@ -51,36 +77,30 @@ export default function Footer() {
           The hero starts this 21.5dvh below its wordmark (37.1 - 15.6); this wordmark sits
           10dvh lower, so these start 10dvh lower too. Reusing the hero's own 37.1/55.7 offsets
           here instead bit into far more of the wordmark and washed it out almost completely. */}
-      <div className="pointer-events-none absolute inset-x-0 top-[47.15dvh] z-10 hidden h-[44.3dvh] lg:block">
-        {Array.from({ length: BLUR_STEPS }).map((_, i) => {
-          const band = 100 / BLUR_STEPS;
-          const blur = (BLUR_MAX_VW * (i + 1)) / BLUR_STEPS;
-          const mask = `linear-gradient(to bottom, transparent ${i * band}%, black ${(i + 1) * band}%, black ${(i + 2) * band}%, transparent ${(i + 3) * band}%)`;
-          return (
-            <div
-              key={i}
-              className="absolute inset-0"
-              style={{ backdropFilter: `blur(${blur}vw)`, WebkitBackdropFilter: `blur(${blur}vw)`, maskImage: mask, WebkitMaskImage: mask }}
-            />
-          );
-        })}
+      <div className="pointer-events-none absolute inset-x-0 z-10 max-lg:top-[55dvh] max-lg:h-[30dvh] lg:top-[47.15dvh] lg:h-[44.3dvh]">
+        <div className="contents lg:hidden">
+          <BlurRamp steps={BLUR_STEPS_MOBILE} />
+        </div>
+        <div className="hidden lg:contents">
+          <BlurRamp steps={BLUR_STEPS_DESKTOP} />
+        </div>
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_0%,rgba(255,255,255,0.6)_20%,rgba(255,255,255,0.88)_40%,#fff_68%)]" />
       </div>
-      <div className="pointer-events-none absolute inset-x-0 top-[65.75dvh] z-10 hidden h-[44.3dvh] bg-linear-to-b from-white/0 to-surface to-68% lg:block" />
+      <div className="pointer-events-none absolute inset-x-0 z-10 bg-linear-to-b from-white/0 to-surface to-68% max-lg:top-[68dvh] max-lg:h-[45dvh] lg:top-[65.75dvh] lg:h-[44.3dvh]" />
 
       {/* The can & cap. Width, not height, is the fixed dimension (Figma 409/1920 = 21.3vw): the
           "made in india" runs below are split at letter boundaries that only line up with the
           can's edges if the two scale off the same axis. */}
       <div
         data-footer-can
-        className="pointer-events-none absolute top-[57.5dvh] left-[49.45vw] z-20 w-[21.3vw] -translate-x-1/2"
+        className="pointer-events-none absolute z-20 -translate-x-1/2 max-lg:top-[63dvh] max-lg:left-1/2 max-lg:w-[61.5vw] lg:top-[57.5dvh] lg:left-[49.45vw] lg:w-[21.3vw]"
       >
         <div className="relative w-full aspect-[409/844]">
           <Image
             src="/footer/can-cap.webp"
             alt="The Cryocap smart cap fitted on a cryogenic container"
             fill
-            sizes="(min-width: 1024px) 22vw, 55vw"
+            sizes="(min-width: 1024px) 22vw, 62vw"
             className="object-contain object-top"
           />
         </div>
@@ -113,6 +133,18 @@ export default function Footer() {
         </div>
       </div>
 
+      {/* On a phone there is no room beside the copy, so the badge drops below the CTA pair and
+          centres on the page instead. Separate element rather than responsive classes on the one
+          above: that one is positioned against the copy block, this one against the footer.
+          Centred with `inset-x-0` + `mx-auto` rather than a translate, because it carries
+          data-footer-copy and so gets a GSAP `y` on arrival. */}
+      <div
+        data-footer-copy
+        className="pointer-events-none absolute inset-x-0 top-[35.5dvh] z-30 mx-auto size-[28vw] lg:hidden"
+      >
+        <Image src="/brand/patented-badge.png" alt="Patented — Intellectual Property" fill sizes="110px" />
+      </div>
+
       {/* "made in india / for the world" — each line in its own clip window so it can slide up
           the way every other headline in this build reveals. Window height matches the line box
           exactly (leading 1.075 of the 5.208vw face) and both are in vw, so the glyphs never
@@ -125,13 +157,13 @@ export default function Footer() {
           in. Painted above the can. */}
       <div
         data-footer-lockup
-        className="pointer-events-none absolute bottom-0 left-1/2 z-30 w-[42.76vw] -translate-x-1/2"
+        className="pointer-events-none absolute left-1/2 z-30 -translate-x-1/2 max-lg:bottom-[8.5dvh] max-lg:w-[92vw] lg:bottom-0 lg:w-[42.76vw]"
       >
         {madeInIndia.map((line, i) => (
-          <div key={i} data-footer-lockup-window className="h-[5.6vw] overflow-hidden">
+          <div key={i} data-footer-lockup-window className="overflow-hidden max-lg:h-[13.89vw] lg:h-[5.6vw]">
             <p
               data-footer-lockup-line
-              className="flex translate-y-full justify-center text-[5.208vw] font-extrabold uppercase leading-[1.075] whitespace-nowrap"
+              className="flex translate-y-full justify-center font-extrabold uppercase whitespace-nowrap max-lg:text-[11vw] max-lg:leading-[1.2626] lg:text-[5.208vw] lg:leading-[1.075]"
             >
               {line.map((run) => (
                 <span key={run.text} className={run.tone}>
