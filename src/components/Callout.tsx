@@ -63,10 +63,13 @@ export default function Callout({ side, pair, icon, title, description }: Props)
           inset the longest of these ("Temperature Fluctuates") wrapped to three lines where
           every sibling takes two; it needs 98% to fit two, so the inset was the thing breaking
           it. `ml-auto` went with it — at full width there is nothing left to push over. */}
-      <div className={`absolute top-[65.07%] -bottom-[60%] w-full overflow-hidden ${right ? "text-right" : ""}`}>
+      {/* The desktop offsets come straight from Figma's 706x229 box. A phone's box is the same
+          ratio but a third of the size, so the same percentage gap reads as a hole between the
+          title and its description — it sits tighter there, and loses the extra top margin. */}
+      <div className={`absolute top-[65.07%] -bottom-[60%] w-full overflow-hidden max-lg:top-[61%] ${right ? "text-right" : ""}`}>
         <p
           data-callout-desc
-          className={`mt-[2.83%] w-full opacity-0 text-[clamp(12px,1.25vw,24px)] leading-[1.26] text-muted`}
+          className={`mt-[2.83%] w-full opacity-0 text-[clamp(12px,1.25vw,24px)] leading-[1.26] text-muted max-lg:mt-0`}
         >
           {description}
         </p>

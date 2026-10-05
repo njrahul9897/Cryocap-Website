@@ -99,12 +99,12 @@ export default function Hero() {
         </div>
 
         {/* ghost labels */}
-        <div className="pointer-events-none absolute top-[68dvh] left-[6vw] z-10 h-[5.47vw] overflow-hidden lg:top-[75.3dvh] lg:left-[4.69vw]">
+        <div className="pointer-events-none absolute top-[70.5dvh] left-[6vw] z-10 h-[5.47vw] overflow-hidden lg:top-[75.3dvh] lg:left-[4.69vw]">
           <p data-stage="label-problems" className={`${ghost} text-[6.04vw] translate-y-full`}>
             problems
           </p>
         </div>
-        <div className="pointer-events-none absolute top-[27.5dvh] right-[6vw] z-10 text-right lg:top-[15.46dvh] lg:right-[4.69vw]">
+        <div className="pointer-events-none absolute top-[25dvh] right-[6vw] z-10 text-right lg:top-[15.46dvh] lg:right-[4.69vw]">
           <div className="h-[5.99vw] overflow-hidden">
             <p data-stage="label-generic" className={`${ghost} text-[6.56vw] translate-y-full`}>
               ordinary
