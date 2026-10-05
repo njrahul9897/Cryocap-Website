@@ -64,10 +64,7 @@ export default function WhereUsedScroll() {
     // GSAP owns these transforms outright, centering included, so the markup can position each
     // element by its top-left and leave the -50%/-50% to xPercent/yPercent here. That also
     // makes each element's visual centre exactly its own `offsetLeft`/`offsetTop`.
-    // x/y pinned to 0 alongside the percentages: left to itself GSAP parses the centring
-    // translate out of the computed matrix into an x offset and then applies the percentage
-    // on top of it, dragging the element half its own width off the left edge.
-    gsap.set([...wordBoxes, figure], { xPercent: -50, yPercent: -50, x: 0, y: 0 });
+    gsap.set([...wordBoxes, figure], { xPercent: -50, yPercent: -50 });
 
     // offset*, NOT getBoundingClientRect: this effect runs at mount, with the section still
     // thousands of pixels below the fold, so a viewport-relative rect would bake that scroll
@@ -131,21 +128,6 @@ export default function WhereUsedScroll() {
       ? offsetWithin(lastSlide, section, "top") + lastSlide.offsetHeight / 2 - vh / 2
       : offsetWithin(lastSlide, section, "left") + lastSlide.offsetWidth / 2 - vw / 2;
 
-    // On a phone the headline AND the mascot climb as the section scrolls INTO view rather than
-    // after it pins, filling the empty screen between how-it-works unpinning and this section
-    // pinning. The sections stay adjacent, so nothing overlaps.
-    //
-    // Built BEFORE the pinned timeline on purpose. Both timelines write the mascot — this one
-    // lands it, phase 2 retreats it — and when two tweens touch one property the one created
-    // later renders later and wins the tick. Pinned second means phase 2 has the last word;
-    // the other way round the mascot stuck in its landed pose for the rest of the section.
-    const arrive = stripVertical
-      ? gsap.timeline({
-          defaults: { ease: "power2.out" },
-          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 1 },
-        })
-      : null;
-
     const tl = gsap.timeline({
       defaults: { ease: "power2.out" },
       scrollTrigger: {
@@ -154,47 +136,30 @@ export default function WhereUsedScroll() {
         end: `+=${PIN_PX}`,
         pin: true,
         scrub: 1,
-        // Keep anticipatePin: without it the pin lands a frame late on a fast scroll and the
-        // next section flashes through underneath. Removing it did smooth the rushed entry,
-        // but that trade was not worth a visible overlap.
-        anticipatePin: 1,
+        // No anticipatePin: it pins EARLY in proportion to scroll velocity, which is why
+        // arriving here fast from the hero rushed the first phase while a slow approach, or
+        // scrolling back up, felt right. It exists to hide the pin flicker on a raw, jumpy
+        // native scroll; Lenis already smooths the scroll, so it buys nothing here and the
+        // velocity-dependent head start is all that is left of it.
         refreshPriority: -1,
       },
     });
 
-    const phase1 = arrive ?? tl;
-    // With phase 1 lifted onto the approach, the pinned timeline opens on phase 2.
-    const PIN_LEAD = 0.3;
-    const p2 = arrive ? PIN_LEAD : PHASE_2;
-    const p3 = arrive ? PIN_LEAD + PHASE_2_DUR : PHASE_3;
-
     // Phase 1 — the headline and the mascot, and nothing else.
-    phase1.to(glyphs, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
+    tl.to(glyphs, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
     // the mascot trails the words by a few frames, so any hitch from the section freshly pinning
     // lands in that gap rather than reading as a stutter in the mascot itself
-    phase1.to(figure, { y: 0, scale: 1, duration: 1.3 }, 0.08);
+    tl.to(figure, { y: 0, scale: 1, duration: 1.3 }, 0.08);
 
     // Phase 2 — the four words fly together into one small line at the top while the mascot
     // retreats back down its entry path at full opacity, the same exit the cap makes.
     wordTargets.forEach(({ el, x, y }) => {
-      tl.to(el, { x, y, scale: SMALL_SCALE, duration: PHASE_2_DUR }, p2);
+      tl.to(el, { x, y, scale: SMALL_SCALE, duration: PHASE_2_DUR }, PHASE_2);
     });
-    // fromTo, because phase 1 may live on the other timeline now: a plain `to` records its
-    // start when the timeline is built, which is the parked pose, and then tweens parked to
-    // parked while the mascot sits on screen. immediateRender:false keeps the stated `from`
-    // from being written at build time, long before the section is in view.
-    // Two things this `from` has to spell out. x/y are reset to 0 because GSAP had already
-    // parsed the centring `translate(-50%,-50%)` out of the computed matrix into an x offset,
-    // and re-applying the percentages on top of it dragged the element half its own width off
-    // the left edge. And the percentages themselves are restated so that reset cannot drop the
-    // centring. The position is a beat INTO the pin, never 0: at 0 the playhead sits on this
-    // tween from the first frame, so it renders the landed `from` straight away — which both
-    // undoes the parked starting pose and leaves the approach with nothing left to animate.
-    tl.fromTo(
+    tl.to(
       figure,
-      { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: 1 },
-      { y: figureTravel, scale: FIGURE_PARKED_SCALE, duration: PHASE_2_DUR, ease: "power2.in", immediateRender: false },
-      p2,
+      { y: figureTravel, scale: FIGURE_PARKED_SCALE, duration: PHASE_2_DUR, ease: "power2.in" },
+      PHASE_2,
     );
 
     // Phase 3 — the photo strip scrolls in and stops with the last one centred, which is where
@@ -203,7 +168,7 @@ export default function WhereUsedScroll() {
     tl.to(
       strip,
       { ...(stripVertical ? { y: -stripTravel } : { x: -stripTravel }), duration: STRIP_DUR, ease: "none" },
-      p3,
+      PHASE_3,
     );
 
     ScrollTrigger.refresh();

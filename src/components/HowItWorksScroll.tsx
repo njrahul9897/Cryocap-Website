@@ -101,10 +101,6 @@ export default function HowItWorksScroll() {
     gsap.set(cap, {
       xPercent: -50,
       yPercent: -50,
-      // x pinned to 0 alongside the percentage: left to itself GSAP parses the centring
-      // translate out of the computed matrix into an x offset and then applies the percentage
-      // on top of it, dragging the cap half its own width off the left edge.
-      x: 0,
       y: capParkY,
       scale: CAP_PARKED.scale,
       rotation: CAP_PARKED.rotation,
@@ -142,21 +138,6 @@ export default function HowItWorksScroll() {
     // `top` directly, once, before the scroll timeline ever runs.
     gsap.set(grid, { top: gridTopY });
 
-    // On a phone the headline AND the cap climb as the section scrolls INTO view rather than
-    // after it pins, filling the empty screen between the previous pin ending and this one
-    // starting. The sections stay adjacent, so nothing overlaps.
-    //
-    // Built BEFORE the pinned timeline on purpose. Both timelines write the cap — this one
-    // lands it, phase 2 parks it — and when two tweens touch one property the one created
-    // later renders later and wins the tick. Pinned second means phase 2 has the last word.
-    const arrive =
-      vw < 1024
-        ? gsap.timeline({
-            defaults: { ease: "power2.out" },
-            scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 1 },
-          })
-        : null;
-
     const tl = gsap.timeline({
       defaults: { ease: "power2.out" },
       scrollTrigger: {
@@ -165,56 +146,39 @@ export default function HowItWorksScroll() {
         end: `+=${PIN_PX}`,
         pin: true,
         scrub: 1,
-        // Keep anticipatePin: without it the pin lands a frame late on a fast scroll and the
-        // next section flashes through underneath. Removing it did smooth the rushed entry,
-        // but that trade was not worth a visible overlap.
-        anticipatePin: 1,
+        // No anticipatePin: it pins EARLY in proportion to scroll velocity, which is why
+        // arriving here fast from the hero rushed the first phase while a slow approach, or
+        // scrolling back up, felt right. It exists to hide the pin flicker on a raw, jumpy
+        // native scroll; Lenis already smooths the scroll, so it buys nothing here and the
+        // velocity-dependent head start is all that is left of it.
         refreshPriority: 0,
       },
     });
 
-const phase1 = arrive ?? tl;
-    // With phase 1 lifted onto the approach, the pinned timeline opens on phase 2.
-    const PIN_LEAD = 0.3;
-    const p2 = arrive ? PIN_LEAD : PHASE_2;
-    const p3 = arrive ? PIN_LEAD + PHASE_2_DUR : PHASE_3;
-
     // Phase 1 — the headline and the cap, and nothing else.
     // each word climbs into its clip window on its own beat: How, then does, then It, then works
-    phase1.to(words, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
+    tl.to(words, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
     // the cap trails the words by a few frames rather than launching in perfect lockstep with
     // them at t=0 — any layout hitch from the section freshly pinning lands in that small gap,
     // before the cap is expected to move, instead of reading as a stutter in the cap itself
-    phase1.to(cap, { y: 0, scale: CAP_LANDED.scale, rotation: CAP_LANDED.rotation, duration: 1.3 }, 0.08);
+    tl.to(cap, { y: 0, scale: CAP_LANDED.scale, rotation: CAP_LANDED.rotation, duration: 1.3 }, 0.08);
 
     // Phase 2 — one scroll later, the headline shrinks into its small position while, at the same
     // time, the cap retreats back down its entry path. `power2.in` mirrors the `power2.out` it
     // arrived on, so it accelerates away rather than easing to a halt off-screen. It keeps full
     // opacity throughout and simply leaves the frame, as in Figma frame 13 — it is never faded.
-    // fromTo for the same reason as the mascot in where-used: with phase 1 possibly on the
-    // other timeline, a plain `to` records its start at build time (the parked pose) and then
-    // tweens parked to parked, stranding the cap on screen. immediateRender:false keeps the
-    // stated `from` from being written before the section is anywhere near view.
-    // Two things this `from` has to spell out. x/y are reset to 0 because GSAP had already
-    // parsed the centring `translate(-50%,-50%)` out of the computed matrix into an x offset,
-    // and re-applying the percentages on top of it dragged the element half its own width off
-    // the left edge. And the percentages themselves are restated so that reset cannot drop the
-    // centring. The position is a beat INTO the pin, never 0: at 0 the playhead sits on this
-    // tween from the first frame, so it renders the landed `from` straight away — which both
-    // undoes the parked starting pose and leaves the approach with nothing left to animate.
-    tl.fromTo(
+    tl.to(
       cap,
-      { xPercent: -50, yPercent: -50, x: 0, y: 0, scale: CAP_LANDED.scale, rotation: CAP_LANDED.rotation },
-      { y: capParkY, scale: CAP_PARKED.scale, rotation: CAP_PARKED.rotation, duration: PHASE_2_DUR, ease: "power2.in", immediateRender: false },
-      p2,
+      { y: capParkY, scale: CAP_PARKED.scale, rotation: CAP_PARKED.rotation, duration: PHASE_2_DUR, ease: "power2.in" },
+      PHASE_2,
     );
     // both rows shrink and slide to their new centred position in one continuous move
-    tl.to(howDoesRow, { y: howDoesShift, scale: textScale, duration: PHASE_2_DUR }, p2);
-    tl.to(itWorksRow, { y: itWorksShift, scale: textScale, duration: PHASE_2_DUR }, p2);
+    tl.to(howDoesRow, { y: howDoesShift, scale: textScale, duration: PHASE_2_DUR }, PHASE_2);
+    tl.to(itWorksRow, { y: itWorksShift, scale: textScale, duration: PHASE_2_DUR }, PHASE_2);
 
     // Phase 3 — only once the cap is gone and the headline has settled do the four steps arrive,
     // one after another.
-    tl.to(gridItems, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.16 }, p3);
+    tl.to(gridItems, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.16 }, PHASE_3);
 
     ScrollTrigger.refresh();
   }, { dependencies: [viewport], revertOnUpdate: true });
