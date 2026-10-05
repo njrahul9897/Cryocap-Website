@@ -15,7 +15,19 @@ const SECONDS_TO_PX = 260;
 const CARD_SCROLL = 10;
 // how much a card swells as it crosses the middle of the screen
 const CARD_ZOOM = 0.08;
-const TOTAL = 30.1;
+// How long a problem pair holds before it is dismissed. Desktop keeps the long read; on a
+// phone the three pairs have to turn over about one swipe apart, which is what the shorter
+// hold buys — a pair's pitch (hold + 0.4 dismiss + 0.1 gap) then lands near 500px of scroll
+// instead of the ~960px that took two or three flicks to get through.
+const PAIR_HOLD_DESKTOP = 3.2;
+const PAIR_HOLD_MOBILE = 1.4;
+const PAIR_GAP = 0.1;
+const FIRST_PAIR_AT = 4.8;
+// Total beats, derived rather than written down: three pair holds, then the solutions beat and
+// the cards' own travel, plus a short tail. Hard-coding it meant a shorter hold would leave the
+// difference as dead scroll at the end of the pin.
+const stageBeats = (hold: number) =>
+  FIRST_PAIR_AT + 3 * hold + 2 * (0.4 + PAIR_GAP) + 4.5 + CARD_SCROLL + 0.2;
 
 export default function StageScroll() {
   const [ready, setReady] = useState(false);
@@ -64,6 +76,8 @@ export default function StageScroll() {
       const vh = window.innerHeight;
       const vw = window.innerWidth;
       const desktop = vw >= 1024;
+      const PAIR_HOLD = desktop ? PAIR_HOLD_DESKTOP : PAIR_HOLD_MOBILE;
+      const TOTAL = stageBeats(PAIR_HOLD);
 
       // Both caps travel along the can's own 15deg axis. Whether that reads as a straight drop
       // or a diagonal lift on screen depends on how far the wrapper is counter-rotated at that
@@ -121,7 +135,11 @@ export default function StageScroll() {
           end: `+=${TOTAL * SECONDS_TO_PX}`,
           pin: true,
           scrub: 1,
-          anticipatePin: 1,
+          // No anticipatePin: it pins EARLY in proportion to scroll velocity, which is why
+        // arriving here fast from the hero rushed the first phase while a slow approach, or
+        // scrolling back up, felt right. It exists to hide the pin flicker on a raw, jumpy
+        // native scroll; Lenis already smooths the scroll, so it buys nothing here and the
+        // velocity-dependent head start is all that is left of it.
           // this pin is built late (it waits for the intro reveal) but sits first on the page,
           // so it has to refresh before the sections below or their start/end land wrong
           refreshPriority: 1,
@@ -171,11 +189,9 @@ export default function StageScroll() {
       const dismiss = (p: ReturnType<typeof pair>, at: number) => {
         tl.to([...p.icons, ...p.titles, ...p.descs], { yPercent: -130, autoAlpha: 0, filter: "blur(6px)", duration: 0.4, ease: "power2.in" }, at);
       };
-      // Three equal 3.2s holds with a 0.1s beat between a dismiss landing and the next pair's
+      // Three equal holds with a 0.1s beat between a dismiss landing and the next pair's
       // reveal starting, same gap the original two-pair timeline used.
-      const PAIR_HOLD = 3.2;
-      const PAIR_GAP = 0.1;
-      const aAt = 4.8;
+      const aAt = FIRST_PAIR_AT;
       const bAt = aAt + PAIR_HOLD + 0.4 + PAIR_GAP;
       const cAt = bAt + PAIR_HOLD + 0.4 + PAIR_GAP;
       const dismissCAt = cAt + PAIR_HOLD;
