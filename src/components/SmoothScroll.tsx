@@ -28,8 +28,8 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       // past a whole section, so the damping goes there rather than into making the page feel
       // heavy under the thumb. All three are touch-only: `lerp`, `smoothWheel` and the untouched
       // wheelMultiplier are what desktop scrolls on, so none of this reaches a mouse or trackpad.
-      touchMultiplier: 0.8,
-      touchInertiaExponent: 2.8,
+      touchMultiplier: 0.65,
+      touchInertiaExponent: 3.4,
       syncTouchLerp: 0.09,
       anchors: true,
     });

@@ -12,9 +12,13 @@ import { useViewportKey } from "@/lib/use-viewport-key";
 // both were worse.
 //
 // What it can do is go past quicker. While the viewport is inside that band a swipe carries
-// further, so the empty stretch takes roughly half the effort to cross while every section's
-// own scroll — where the animations live — keeps its original pace.
-const BOOST = 2.2;
+// further, so the empty stretch takes less effort to cross while every section's own scroll —
+// where the animations live — keeps its original pace.
+//
+// Started at 2.2, which measured 598px to a section's 271px for the same flick and was the one
+// place on the page where scrolling was genuinely fast. A nudge reads as the empty stretch not
+// dragging; a doubling reads as the page getting away from you.
+const BOOST = 1.35;
 
 // Phones only. The gap is the same on desktop but a wheel or trackpad crosses it without
 // complaint, and the pacing there is the approved one.
