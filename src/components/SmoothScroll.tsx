@@ -21,8 +21,15 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       // Momentum on top of that easily overshoots a whole section in one flick, so damp how
       // far a swipe throws and make it shed that momentum faster (higher exponent = quicker
       // decay). syncTouchLerp is the touch equivalent of `lerp` above.
-      touchMultiplier: 0.9,
-      touchInertiaExponent: 2.1,
+      //
+      // The multiplier governs how far a swipe carries WHILE the finger is down, and at 0.9 a
+      // flick already tracks the finger almost 1:1 — that is not the part that overshoots. The
+      // exponent governs what happens after the finger lifts, which is where a hard flick threw
+      // past a whole section, so the damping goes there rather than into making the page feel
+      // heavy under the thumb. All three are touch-only: `lerp`, `smoothWheel` and the untouched
+      // wheelMultiplier are what desktop scrolls on, so none of this reaches a mouse or trackpad.
+      touchMultiplier: 0.8,
+      touchInertiaExponent: 2.8,
       syncTouchLerp: 0.09,
       anchors: true,
     });
