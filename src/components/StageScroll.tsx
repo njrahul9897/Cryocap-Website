@@ -135,11 +135,10 @@ export default function StageScroll() {
           end: `+=${TOTAL * SECONDS_TO_PX}`,
           pin: true,
           scrub: 1,
-          // No anticipatePin: it pins EARLY in proportion to scroll velocity, which is why
-        // arriving here fast from the hero rushed the first phase while a slow approach, or
-        // scrolling back up, felt right. It exists to hide the pin flicker on a raw, jumpy
-        // native scroll; Lenis already smooths the scroll, so it buys nothing here and the
-        // velocity-dependent head start is all that is left of it.
+          // Keep anticipatePin: without it the pin lands a frame late on a fast scroll and the
+          // next section flashes through underneath. Removing it did smooth the rushed entry,
+          // but that trade was not worth a visible overlap.
+          anticipatePin: 1,
           // this pin is built late (it waits for the intro reveal) but sits first on the page,
           // so it has to refresh before the sections below or their start/end land wrong
           refreshPriority: 1,
