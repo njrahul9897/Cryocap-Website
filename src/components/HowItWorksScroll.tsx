@@ -146,18 +146,35 @@ export default function HowItWorksScroll() {
         end: `+=${PIN_PX}`,
         pin: true,
         scrub: 1,
-        // No anticipatePin: it pins EARLY in proportion to scroll velocity, which is why
-        // arriving here fast from the hero rushed the first phase while a slow approach, or
-        // scrolling back up, felt right. It exists to hide the pin flicker on a raw, jumpy
-        // native scroll; Lenis already smooths the scroll, so it buys nothing here and the
-        // velocity-dependent head start is all that is left of it.
+        // Keep anticipatePin: without it the pin lands a frame late on a fast scroll and the
+        // next section flashes through underneath. Removing it did smooth the rushed entry,
+        // but that trade was not worth a visible overlap.
+        anticipatePin: 1,
         refreshPriority: 0,
       },
     });
 
+    // On a phone the HEADLINE climbs as the section scrolls INTO view rather than after it
+    // pins. Between the previous section's pin ending and this one's starting there is a
+    // viewport of scroll where the outgoing content has left and this one had not begun — an
+    // empty screen that read as a missing section; the headline arriving across that approach
+    // fills it, with the two sections still adjacent so nothing overlaps.
+    //
+    // Only the words move out. The cap is animated again by phase 2, and two scrubbed timelines
+    // driving one element fight: the scroll-in one keeps writing its end state and the cap
+    // never retreats. Phase 2 moves the ROWS, which are different elements from these words, so
+    // nothing is driven twice. Desktop keeps the original single-timeline choreography.
+    const mobile = vw < 1024;
+    const phase1 = mobile
+      ? gsap.timeline({
+          defaults: { ease: "power2.out" },
+          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 1 },
+        })
+      : tl;
+
     // Phase 1 — the headline and the cap, and nothing else.
     // each word climbs into its clip window on its own beat: How, then does, then It, then works
-    tl.to(words, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
+    phase1.to(words, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
     // the cap trails the words by a few frames rather than launching in perfect lockstep with
     // them at t=0 — any layout hitch from the section freshly pinning lands in that small gap,
     // before the cap is expected to move, instead of reading as a stutter in the cap itself

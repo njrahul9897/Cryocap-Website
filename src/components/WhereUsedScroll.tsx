@@ -136,17 +136,31 @@ export default function WhereUsedScroll() {
         end: `+=${PIN_PX}`,
         pin: true,
         scrub: 1,
-        // No anticipatePin: it pins EARLY in proportion to scroll velocity, which is why
-        // arriving here fast from the hero rushed the first phase while a slow approach, or
-        // scrolling back up, felt right. It exists to hide the pin flicker on a raw, jumpy
-        // native scroll; Lenis already smooths the scroll, so it buys nothing here and the
-        // velocity-dependent head start is all that is left of it.
+        // Keep anticipatePin: without it the pin lands a frame late on a fast scroll and the
+        // next section flashes through underneath. Removing it did smooth the rushed entry,
+        // but that trade was not worth a visible overlap.
+        anticipatePin: 1,
         refreshPriority: -1,
       },
     });
 
+    // On a phone the HEADLINE climbs as the section scrolls INTO view rather than after it
+    // pins, filling the empty screen between how-it-works unpinning and this section pinning.
+    // The sections stay adjacent, so nothing overlaps.
+    //
+    // Only the glyphs move out. The mascot is animated again by phase 2, and two scrubbed
+    // timelines driving one element fight — the scroll-in one keeps writing its end state and
+    // the mascot never retreats, showing through the photo strip. Phase 2 moves the word BOXES,
+    // which are different elements from these glyphs. Desktop keeps the original choreography.
+    const phase1 = stripVertical
+      ? gsap.timeline({
+          defaults: { ease: "power2.out" },
+          scrollTrigger: { trigger: section, start: "top bottom", end: "top top", scrub: 1 },
+        })
+      : tl;
+
     // Phase 1 — the headline and the mascot, and nothing else.
-    tl.to(glyphs, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
+    phase1.to(glyphs, { yPercent: -100, duration: 0.5, stagger: 0.15 }, 0);
     // the mascot trails the words by a few frames, so any hitch from the section freshly pinning
     // lands in that gap rather than reading as a stutter in the mascot itself
     tl.to(figure, { y: 0, scale: 1, duration: 1.3 }, 0.08);
