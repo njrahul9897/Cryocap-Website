@@ -90,7 +90,7 @@ const slides = [
 
 export default function WhereUsed() {
   return (
-    <section data-whereused className="relative h-dvh overflow-hidden">
+    <section data-whereused className="relative h-dvh overflow-hidden max-lg:-mt-[70dvh]">
       {words.map((w) => (
         <div
           key={w.id}

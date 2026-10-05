@@ -50,7 +50,7 @@ const madeInIndia = [
 
 export default function Footer() {
   return (
-    <footer data-footer className="relative h-dvh overflow-hidden bg-white">
+    <footer data-footer className="relative h-dvh overflow-hidden bg-white max-lg:-mt-[70dvh]">
       {/* Giant ghost wordmark — same size and gradient as the hero's, parked lower (Figma puts
           its frame at y=277 on the 1080 frame). The phone takes the hero's own mobile size, so
           phone size is the one in the mobile design (18.3vw renders "Cryocap" 280px wide on a
