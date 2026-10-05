@@ -18,17 +18,20 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       // scrubs then chase, giving the jerky, over-fast feel on a phone. Letting Lenis drive
       // touch means the scrub gets a smooth, evenly-paced position to follow.
       syncTouch: true,
-      // No momentum throw at all. On touchend Lenis adds a delta of
-      // `|velocity| ** touchInertiaExponent` (lenis.mjs:630), and velocity is pixels per FRAME
-      // (lenis.mjs:664) — so for any real flick, which runs tens of pixels a frame, that
-      // exponent is applied to a number far greater than 1 and makes the throw exponentially
-      // BIGGER. At 60px/frame an exponent of 2.1 throws ~5,500px. An earlier comment here had
-      // this backwards as "higher exponent = quicker decay", which is only true below 1px/frame
-      // — the speed synthetic touch events happen to produce, so emulation never showed it.
+      // A short, BOUNDED glide after the finger lifts. Lenis throws
+      // `|velocity| ** touchInertiaExponent` on touchend (lenis.mjs:630) where velocity is
+      // pixels per FRAME (lenis.mjs:664) — so this exponent is applied to a number in the tens
+      // for any real flick, and every step up multiplies the throw rather than damping it. An
+      // earlier comment here had it backwards as "higher exponent = quicker decay", true only
+      // below 1px/frame, which is all synthetic touch events produce; that is why emulation
+      // never showed the problem.
       //
-      // 0 makes that term |velocity|**0 === 1, i.e. a one-pixel delta: the page moves while the
-      // finger is down and stops when it lifts, with nothing thrown afterwards.
-      touchInertiaExponent: 0,
+      // What the number buys, at 17 / 35 / 67 px-per-frame (gentle / normal / hard):
+      //   1.5  ->   70 /  207 /  548px     <- here: a glide you can feel, that always stops
+      //   1.7  ->  124 /  422 / 1272px     <- Lenis default
+      //   2.1  ->  384 / 1748 / 6835px     <- what this was, and read as "much too fast"
+      // 0 removes the glide entirely, which was calm but made the page hard work to get down.
+      touchInertiaExponent: 1.5,
       // 1:1 with the finger, and that is deliberate rather than a tuning guess. During a drag
       // Lenis applies this multiplier with `lerp: 1` (lenis.mjs:634), i.e. instantly — so
       // anything below 1 means the page travels less than the thumb that is dragging it, which
