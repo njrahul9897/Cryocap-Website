@@ -31,6 +31,10 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
     triggerRef.current = document.activeElement as HTMLElement | null;
     setPhase("form");
     dialogRef.current?.showModal();
+    // Focusing the first field is a keyboard convenience, so it is for pointers that have a
+    // keyboard beside them. On a phone it throws up the on-screen keyboard over the form, and
+    // on iOS it also zooms the page in on the field before the form has even been read.
+    if (window.matchMedia("(pointer: fine)").matches) formRef.current?.querySelector("input")?.focus();
     // showModal() does NOT stop the page scrolling on its own — this site's wheel events are
     // driven by Lenis, which has no idea a native <dialog> just grabbed focus and keeps
     // smooth-scrolling the document underneath it. Same stop/start pair IntroReveal uses.
@@ -80,7 +84,11 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
         ref={dialogRef}
         onClick={onDialogClick}
         aria-labelledby="contact-modal-heading"
-        className="m-auto max-h-[90dvh] w-[min(92vw,480px)] overflow-y-auto rounded-[clamp(18px,1.458vw,28px)] bg-white p-0 backdrop:bg-ink/40"
+        // data-lenis-prevent, or this does not scroll on a phone at all: opening the modal
+        // stops Lenis, and a stopped Lenis cancels every touchmove it sees — including the
+        // ones meant for this panel. The attribute makes it skip them (lenis.mjs:609).
+        data-lenis-prevent
+        className="m-auto max-h-[90dvh] w-[min(92vw,480px)] overflow-y-auto overscroll-contain rounded-[clamp(18px,1.458vw,28px)] bg-white p-0 backdrop:bg-ink/40"
       >
         <div className="relative p-[clamp(24px,2.6vw,48px)]">
           {/* Only the form phase gets the × — the success phase has its own "Close" button
@@ -107,7 +115,7 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
               </p>
 
               <form ref={formRef} onSubmit={onSubmit} className="mt-[clamp(18px,1.875vw,32px)] flex flex-col gap-[clamp(14px,1.25vw,20px)]">
-                <Field label="Name" name="name" autoComplete="name" autoFocus required />
+                <Field label="Name" name="name" autoComplete="name" required />
                 <Field label="Email ID" name="email" type="email" autoComplete="email" required />
                 <Field label="Phone Number" name="phone" type="tel" autoComplete="tel" required />
                 <Field label="Organisation" name="organisation" autoComplete="organization" />
@@ -216,11 +224,10 @@ type FieldProps = {
   name: string;
   type?: string;
   required?: boolean;
-  autoFocus?: boolean;
   autoComplete?: string;
 };
 
-function Field({ label, name, type = "text", required, autoFocus, autoComplete }: FieldProps) {
+function Field({ label, name, type = "text", required, autoComplete }: FieldProps) {
   return (
     <label className="flex flex-col gap-[clamp(4px,0.417vw,8px)] text-left">
       <span className="text-[clamp(12px,0.833vw,14px)] font-medium text-ink">
@@ -231,9 +238,8 @@ function Field({ label, name, type = "text", required, autoFocus, autoComplete }
         name={name}
         type={type}
         required={required}
-        autoFocus={autoFocus}
         autoComplete={autoComplete}
-        className="rounded-[clamp(10px,0.833vw,14px)] border border-ink/15 bg-white px-[clamp(12px,1.04vw,18px)] py-[clamp(9px,0.78vw,13px)] text-[clamp(13px,0.9vw,16px)] text-ink outline-none transition-colors focus:border-ink"
+        className="rounded-[clamp(10px,0.833vw,14px)] border border-ink/15 bg-white px-[clamp(12px,1.04vw,18px)] py-[clamp(9px,0.78vw,13px)] text-[16px] text-ink outline-none transition-colors focus:border-ink"
       />
     </label>
   );
