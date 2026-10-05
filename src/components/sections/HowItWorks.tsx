@@ -36,7 +36,7 @@ const steps: Step[] = [
     imgWidth: "w-[14vw] lg:w-[6vw]",
     caption: (
       <>
-        Install the Cryocap<sup className="text-[0.6em]">TM</sup> on the container
+        Swap your can’s lid for Cryocap<sup className="text-[0.6em]">TM</sup>.
       </>
     ),
   },
@@ -45,21 +45,21 @@ const steps: Step[] = [
     alt: "Enabling Bluetooth to pair the cap with the Aone app",
     ratio: "180/238",
     imgWidth: "w-[22vw] lg:w-[9.4vw]",
-    caption: "Connects to your Aone system",
+    caption: "Turn on Bluetooth and connect.",
   },
   {
     src: "/how-it-works/monitor-dashboard.gif",
     alt: "Aone dashboard showing live temperature and nitrogen level",
     ratio: "180/238",
     imgWidth: "w-[22vw] lg:w-[9.4vw]",
-    caption: "Monitors temperature, nitrogen & location",
+    caption: "Open the AOne app to see every can live.",
   },
   {
     src: "/how-it-works/notification-alert.gif",
     alt: "Temperature drop alert notification over the dashboard",
     ratio: "180/238",
     imgWidth: "w-[22vw] lg:w-[9.4vw]",
-    caption: "Sends instant alerts if something is wrong",
+    caption: "Get an alert the moment something changes.",
   },
 ];
 
