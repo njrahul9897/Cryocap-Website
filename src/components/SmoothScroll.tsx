@@ -18,18 +18,20 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       // scrubs then chase, giving the jerky, over-fast feel on a phone. Letting Lenis drive
       // touch means the scrub gets a smooth, evenly-paced position to follow.
       syncTouch: true,
-      // Momentum on top of that easily overshoots a whole section in one flick, so damp how
-      // far a swipe throws and make it shed that momentum faster (higher exponent = quicker
-      // decay). syncTouchLerp is the touch equivalent of `lerp` above.
+      // No momentum throw at all. On touchend Lenis adds a delta of
+      // `|velocity| ** touchInertiaExponent` (lenis.mjs:630), and velocity is pixels per FRAME
+      // (lenis.mjs:664) — so for any real flick, which runs tens of pixels a frame, that
+      // exponent is applied to a number far greater than 1 and makes the throw exponentially
+      // BIGGER. At 60px/frame an exponent of 2.1 throws ~5,500px. An earlier comment here had
+      // this backwards as "higher exponent = quicker decay", which is only true below 1px/frame
+      // — the speed synthetic touch events happen to produce, so emulation never showed it.
       //
-      // The multiplier governs how far a swipe carries WHILE the finger is down, and at 0.9 a
-      // flick already tracks the finger almost 1:1 — that is not the part that overshoots. The
-      // exponent governs what happens after the finger lifts, which is where a hard flick threw
-      // past a whole section, so the damping goes there rather than into making the page feel
-      // heavy under the thumb. All three are touch-only: `lerp`, `smoothWheel` and the untouched
-      // wheelMultiplier are what desktop scrolls on, so none of this reaches a mouse or trackpad.
-      touchMultiplier: 0.65,
-      touchInertiaExponent: 3.4,
+      // 0 makes that term |velocity|**0 === 1, i.e. a one-pixel delta: the page moves while the
+      // finger is down and stops when it lifts, with nothing thrown afterwards.
+      touchInertiaExponent: 0,
+      // With no throw to compensate for, the finger-down tracking carries the whole feel, so it
+      // comes back up from the 0.65 it was lowered to while fighting the momentum.
+      touchMultiplier: 0.8,
       syncTouchLerp: 0.09,
       anchors: true,
     });
