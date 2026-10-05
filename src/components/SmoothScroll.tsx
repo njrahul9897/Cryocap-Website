@@ -29,9 +29,11 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       // 0 makes that term |velocity|**0 === 1, i.e. a one-pixel delta: the page moves while the
       // finger is down and stops when it lifts, with nothing thrown afterwards.
       touchInertiaExponent: 0,
-      // With no throw to compensate for, the finger-down tracking carries the whole feel, so it
-      // comes back up from the 0.65 it was lowered to while fighting the momentum.
-      touchMultiplier: 0.8,
+      // 1:1 with the finger, and that is deliberate rather than a tuning guess. During a drag
+      // Lenis applies this multiplier with `lerp: 1` (lenis.mjs:634), i.e. instantly — so
+      // anything below 1 means the page travels less than the thumb that is dragging it, which
+      // is precisely the "sticky" feeling. At 1 the content holds to the finger exactly.
+      touchMultiplier: 1,
       syncTouchLerp: 0.09,
       anchors: true,
     });
