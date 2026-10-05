@@ -136,7 +136,11 @@ export default function WhereUsedScroll() {
         end: `+=${PIN_PX}`,
         pin: true,
         scrub: 1,
-        anticipatePin: 1,
+        // No anticipatePin: it pins EARLY in proportion to scroll velocity, which is why
+        // arriving here fast from the hero rushed the first phase while a slow approach, or
+        // scrolling back up, felt right. It exists to hide the pin flicker on a raw, jumpy
+        // native scroll; Lenis already smooths the scroll, so it buys nothing here and the
+        // velocity-dependent head start is all that is left of it.
         refreshPriority: -1,
       },
     });
