@@ -191,11 +191,10 @@ body {
    from an effect, because hydration can be seconds away on a phone and until then an
    effect-applied lock does not exist.
 
-   The height clamp is what actually does the work. Blocking gestures turned out to be a losing
-   game — overflow is advisory on iOS, a main-thread touchmove handler loses the race against
-   Chrome's compositor on Android — so instead of fighting the scroll, this leaves nothing to
-   scroll: the body is held to one viewport and clipped, so the document has no scrollable
-   overflow at all while the intro is up. The rest are belt and braces. */
+   Blocking the gesture turned out to be a losing game — overflow is advisory on iOS, and a
+   main-thread touchmove handler loses the race against Chrome's compositor on Android. So
+   rather than fight the scroll this leaves nothing to scroll: the page is held to one viewport
+   and clipped, so the document has no scrollable overflow at all while the intro is up. */
 html[data-intro-pending],
 html[data-intro-pending] body {
   /* Both elements, not just the body: Lenis puts `height: auto` on the html element, which
@@ -203,7 +202,4 @@ html[data-intro-pending] body {
      again. Clamping html to the viewport is what makes the body's 100% mean one screen. */
   height: 100%;
   overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-  touch-action: pinch-zoom;
 }

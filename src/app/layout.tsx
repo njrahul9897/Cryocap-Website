@@ -33,42 +33,7 @@ export const viewport: Viewport = {
 // effect: `scrollRestoration` belongs to the document, resets to "auto" on every navigation, and
 // is consulted before React has run at all, so setting it from the previous document does
 // nothing for the reload.
-// Same reasoning applies to the intro's scroll lock, which is why it is bolted on here rather
-// than left to CSS alone. `overflow:hidden` is advisory on iOS Safari — the body keeps panning
-// underneath it — and `touch-action` has its own gaps on the document scroller. Cancelling
-// touchmove is the one thing every mobile browser honours, and installing it from this script
-// means it is live while the HTML is still parsing, long before hydration could attach it. The
-// listener reads the attribute on each event instead of capturing state, so IntroReveal
-// removing that attribute is all it takes to hand scrolling back, and the listener then
-// unregisters itself on its next call.
-const SCROLL_SETUP = `
-try{history.scrollRestoration='manual'}catch(e){}
-(function(){
-  var html=document.documentElement;
-  var block=function(e){
-    if(!html.hasAttribute('data-intro-pending')){
-      document.removeEventListener('touchmove',block,{capture:true});
-      return;
-    }
-    if(e.cancelable){e.preventDefault()}
-  };
-  document.addEventListener('touchmove',block,{passive:false,capture:true});
-  // Last line of defence, and the only one that does not care HOW the page moved. Cancelling
-  // touchmove assumes the scroll came from a finger this listener saw; this one just notices
-  // the document is off the top while the intro is still up and puts it back, which also
-  // covers a restored scroll position, a bfcache restore and any gesture the touch handler
-  // never sees. Cheap, because nothing should be scrolling during the intro anyway.
-  var pin=function(){
-    if(!html.hasAttribute('data-intro-pending')){
-      window.removeEventListener('scroll',pin);
-      return;
-    }
-    if(window.scrollY!==0||window.pageYOffset!==0){window.scrollTo(0,0)}
-  };
-  window.addEventListener('scroll',pin,{passive:true});
-  pin();
-})();
-`;
+const SCROLL_SETUP = "try{history.scrollRestoration='manual'}catch(e){}";
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
