@@ -51,8 +51,10 @@ export default function Solutions() {
       <div
         data-solutions="cards"
         // opacity-0 matters: StageScroll only parks these once the intro reveal has finished, so
-        // without it the stack sits at top-0 fully opaque through the reveal and early hero
-        className="pointer-events-none absolute top-0 left-[45.94vw] z-30 flex w-[36.74vw] flex-col gap-[3.125vw] opacity-0 max-lg:left-[6vw] max-lg:w-[88vw] max-lg:gap-6"
+        // without it the stack sits at top-0 fully opaque through the reveal and early hero.
+        // will-change on mobile: the stack only translates there (no per-card zoom), so as its
+        // own GPU layer it slides without repainting six shadowed cards every frame.
+        className="pointer-events-none absolute top-0 left-[45.94vw] z-30 flex w-[36.74vw] flex-col gap-[3.125vw] opacity-0 max-lg:left-[6vw] max-lg:w-[88vw] max-lg:gap-6 max-lg:will-change-transform"
       >
         {solutions.map((s) => (
           <SolutionCard key={s.title} {...s} />

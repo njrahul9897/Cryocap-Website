@@ -149,7 +149,12 @@ export default function StageScroll() {
         // ~95px with the scale stuck) and then snapped on the next swipe, which on a phone is
         // the stutter that made the cards hard to read. The timeline updates on every frame
         // the cards actually move.
-        onUpdate: cardZoom,
+        //
+        // Desktop only. Each card scales about its own centre by a different amount, so while
+        // the stack travels the gaps between cards stretch and squeeze — on a phone, where the
+        // cards are nearly full-width, that reads as a rolling-shutter wobble and strains the
+        // eye. There the stack moves as one rigid block (composited, see Solutions.tsx).
+        onUpdate: desktop ? cardZoom : undefined,
       });
 
       // On mobile the hero parks the can above centre, to tighten the space under the tagline.
@@ -248,7 +253,7 @@ export default function StageScroll() {
       gsap.set(solutionsCards, { y: stage.offsetHeight * 1.1, autoAlpha: 0 });
       tl.set(solutionsCards, { autoAlpha: 1 }, dismissCAt + 4.2);
       tl.to(solutionsCards, { y: -solutionsCards.offsetHeight, duration: CARD_SCROLL, ease: "none" }, dismissCAt + 4.5);
-      cardZoom();
+      if (desktop) cardZoom();
 
       tl.to({}, { duration: 0.2 }, TOTAL - 0.2);
 
