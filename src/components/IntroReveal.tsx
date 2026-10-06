@@ -35,6 +35,14 @@ const T = {
   settle: { at: 11.6, fadeFromDesktop: 0.853 - 0.371, fadeFromMobile: 0.853 - 0.36, fadeDur: 0.6, gridDur: 0.9 },
 };
 
+// Playback speed-ups over the prototype timings above: the black bars open 1.25x faster and the
+// phrases run 1.15x faster. Kept as factors so T stays the frame-measured reference.
+const BAR_SPEED = 1.25;
+const TEXT_SPEED = 1.15;
+// The hero starts arriving this long BEFORE the last letter has fully left the window, so the
+// hand-off reads as one move. In the prototype there was ~0.85s of empty white between the two.
+const HERO_OVERLAP = 0.15;
+
 function shouldSkip() {
   return played || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
@@ -144,29 +152,40 @@ export default function IntroReveal() {
       });
 
       tl.call(() => getLenis()?.stop(), [], 0.05);
-      tl.to("[data-bar='top']", { yPercent: -100, duration: T.bars.dur, ease: T.bars.ease }, 0);
-      tl.to("[data-bar='bottom']", { yPercent: 100, duration: T.bars.dur, ease: T.bars.ease }, 0);
+      const barsDur = T.bars.dur / BAR_SPEED;
+      tl.to("[data-bar='top']", { yPercent: -100, duration: barsDur, ease: T.bars.ease }, 0);
+      tl.to("[data-bar='bottom']", { yPercent: 100, duration: barsDur, ease: T.bars.ease }, 0);
 
+      const letterDur = T.letterDur / TEXT_SPEED;
+      const stagger = T.stagger / TEXT_SPEED;
       T.phrases.forEach((p, i) => {
         tl.to(
           letters[i],
-          { y: 0, duration: T.letterDur, ease: "power2.out", stagger: { each: T.stagger, from: "end" } },
-          p.enter,
+          { y: 0, duration: letterDur, ease: "power2.out", stagger: { each: stagger, from: "end" } },
+          p.enter / TEXT_SPEED,
         );
         tl.to(
           letters[i],
-          { y: -travel, duration: T.letterDur, ease: "power2.in", stagger: { each: T.stagger, from: "start" } },
-          p.exit,
+          { y: -travel, duration: letterDur, ease: "power2.in", stagger: { each: stagger, from: "start" } },
+          p.exit / TEXT_SPEED,
         );
       });
 
-      tl.to(fade, { autoAlpha: 1, y: 0, duration: T.heroFade.dur, ease: "reveal" }, T.heroFade.at);
-      tl.to(chrome, { autoAlpha: 1, duration: T.chromeFade.dur, ease: "power1.out" }, T.chromeFade.at);
-      tl.to(rise, { yPercent: 0, x: 0, rotation: 0, duration: T.productRise.dur, ease: "sine.out" }, T.productRise.at);
-      tl.to(rise, { autoAlpha: 1, duration: 0.3, ease: "none" }, T.productRise.at);
+      // Everything after the phrases is timed off the moment the last letter clears the window
+      // (and never before the bars are fully open), rather than off the prototype's fixed 10.05s
+      // — that left a beat of blank white, and the speed-ups above would only have widened it.
+      // The hero's internal timing (wordmark, chrome, can, frost) keeps the prototype's spacing.
+      const lastPhrase = T.phrases.length - 1;
+      const textEnd = T.phrases[lastPhrase].exit / TEXT_SPEED + (letters[lastPhrase].length - 1) * stagger + letterDur;
+      const shift = Math.max(textEnd - HERO_OVERLAP, barsDur) - T.heroFade.at;
 
-      if (whiteFade) tl.to(whiteFade, { y: 0, duration: T.settle.fadeDur, ease: "power2.inOut" }, T.settle.at);
-      if (grid) tl.to(grid, { yPercent: 0, duration: T.settle.gridDur, ease: "power2.out" }, T.settle.at);
+      tl.to(fade, { autoAlpha: 1, y: 0, duration: T.heroFade.dur, ease: "reveal" }, T.heroFade.at + shift);
+      tl.to(chrome, { autoAlpha: 1, duration: T.chromeFade.dur, ease: "power1.out" }, T.chromeFade.at + shift);
+      tl.to(rise, { yPercent: 0, x: 0, rotation: 0, duration: T.productRise.dur, ease: "sine.out" }, T.productRise.at + shift);
+      tl.to(rise, { autoAlpha: 1, duration: 0.3, ease: "none" }, T.productRise.at + shift);
+
+      if (whiteFade) tl.to(whiteFade, { y: 0, duration: T.settle.fadeDur, ease: "power2.inOut" }, T.settle.at + shift);
+      if (grid) tl.to(grid, { yPercent: 0, duration: T.settle.gridDur, ease: "power2.out" }, T.settle.at + shift);
 
       return () => {
         unlock();

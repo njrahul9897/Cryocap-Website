@@ -189,8 +189,9 @@ export default function HowItWorksScroll() {
       stops: [
         // the stage's cards leave, this section slides up and pins, the headline and cap land
         { t: PHASE_2 - 0.05, seconds: 2.2 },
-        // headline shrinks, cap leaves, the four steps arrive
-        { t: tl.duration(), seconds: 1.6 },
+        // headline shrinks, cap leaves, the four steps arrive — unhurried, so each GIF is seen
+        // landing
+        { t: tl.duration(), seconds: 2.0 },
       ],
     });
 

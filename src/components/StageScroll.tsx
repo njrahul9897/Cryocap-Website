@@ -78,7 +78,14 @@ export default function StageScroll() {
       const vw = window.innerWidth;
       const desktop = vw >= 1024;
       const PAIR_HOLD = desktop ? PAIR_HOLD_DESKTOP : PAIR_HOLD_MOBILE;
-      const TOTAL = stageBeats(PAIR_HOLD);
+      // The Cryocap cap's return (step 7 below). On a phone it gets nearly 3x the scroll room,
+      // starting in the idle beat after the can settles at +1.8: its swipe step was short enough
+      // that a normal swipe played almost the whole drop under the finger and the cap snapped on.
+      // Everything in the solutions beat then runs that much later, hence `solDelay`.
+      const CAP_BACK = desktop ? { at: 2.2, dur: 0.6 } : { at: 2.0, dur: 1.6 };
+      const capSeated = CAP_BACK.at + CAP_BACK.dur;
+      const solDelay = capSeated - 2.8;
+      const TOTAL = stageBeats(PAIR_HOLD) + solDelay;
 
       // Both caps travel along the can's own 15deg axis. Whether that reads as a straight drop
       // or a diagonal lift on screen depends on how far the wrapper is counter-rotated at that
@@ -244,19 +251,21 @@ export default function StageScroll() {
 
       // 7. Cryocap cap returns (branding with it), then SOLUTIONS sweeps across.
       // The wrapper sits at -15deg here, so unwinding the tilted lift reads as a straight drop on screen.
-      tl.to(cap, { x: 0, y: 0, duration: 0.6, ease: "power2.in" }, dismissCAt + 2.2);
-      tl.to(canPlain, { autoAlpha: 0, duration: 0.3 }, dismissCAt + 2.6);
-      tl.to(sweepSolutions, { x: -(vw + sweepSolutions.offsetWidth), duration: 1.6, ease: "none" }, dismissCAt + 3.2);
+      tl.to(cap, { x: 0, y: 0, duration: CAP_BACK.dur, ease: "power2.in" }, dismissCAt + CAP_BACK.at);
+      tl.to(canPlain, { autoAlpha: 0, duration: 0.3 }, dismissCAt + capSeated - 0.2);
+      // the sweep starts 0.4 after the cap is seated: +3.2 on desktop, as in the design
+      const solAt = dismissCAt + capSeated + 0.4;
+      tl.to(sweepSolutions, { x: -(vw + sweepSolutions.offsetWidth), duration: 1.6, ease: "none" }, solAt);
 
       // 8. Solutions: the ghost wordmark slides up out of its clip window, then the six cards
       // ride up the right-hand side past the parked can. The travel is measured off the real
       // stack height so every card clears the top whatever the viewport.
-      tl.to(solutionsWord, { yPercent: -100, duration: 0.6 }, dismissCAt + 4.0);
+      tl.to(solutionsWord, { yPercent: -100, duration: 0.6 }, solAt + 0.8);
       // Parked a clear margin below the stage (not flush with the fold, which left the top
       // card's ring showing) and held hidden until the solutions beat actually starts.
       gsap.set(solutionsCards, { y: stage.offsetHeight * 1.1, autoAlpha: 0 });
-      tl.set(solutionsCards, { autoAlpha: 1 }, dismissCAt + 4.2);
-      tl.to(solutionsCards, { y: -solutionsCards.offsetHeight, duration: CARD_SCROLL, ease: "none" }, dismissCAt + 4.5);
+      tl.set(solutionsCards, { autoAlpha: 1 }, solAt + 1.0);
+      tl.to(solutionsCards, { y: -solutionsCards.offsetHeight, duration: CARD_SCROLL, ease: "none" }, solAt + 1.3);
       if (desktop) cardZoom();
 
       tl.to({}, { duration: 0.2 }, TOTAL - 0.2);
@@ -267,7 +276,7 @@ export default function StageScroll() {
       // sized to what that step animates (see rest-points.ts).
       const cardsFrom = stage.offsetHeight * 1.1;
       const cardsTo = -solutionsCards.offsetHeight;
-      const cardsAt = dismissCAt + 4.5;
+      const cardsAt = solAt + 1.3;
       // Column translate -> timeline time, inverting the linear card tween above.
       const cardTime = (y: number) => cardsAt + (CARD_SCROLL * (y - cardsFrom)) / (cardsTo - cardsFrom);
       // Clear of the header above and the bottom bar below.
@@ -305,11 +314,11 @@ export default function StageScroll() {
         // pair C, labels and lines out, generic cap off, can moved into its solutions spot —
         // the busiest step on the page, hence the longest glide
         { t: dismissCAt + 1.9, seconds: 2.0 },
-        // Cryocap cap seated again, before the SOLUTIONS sweep starts at +3.2
-        { t: dismissCAt + 3.0, seconds: 0.9 },
-        // SOLUTIONS swept fully across (it ends at +4.8). The cards are already moving by then
-        // but start a margin below the stage, so they are still out of sight here.
-        { t: dismissCAt + 4.85, seconds: 1.5 },
+        // Cryocap cap seated again (and the plain collar faded), before the SOLUTIONS sweep
+        { t: dismissCAt + capSeated + 0.15, seconds: 1.6 },
+        // SOLUTIONS swept fully across (1.6 after it starts). The cards are already moving by
+        // then but start a margin below the stage, so they are still out of sight here.
+        { t: solAt + 1.65, seconds: 1.5 },
         // the first page of cards rises a full screen; later pages move about half that
         ...pageTimes.map((t, i) => ({ t, seconds: i === 0 ? 1.8 : 1.4 })),
       ];

@@ -190,7 +190,7 @@ export default function WhereUsedScroll() {
         { t: PHASE_2 - 0.05, seconds: 2.0 },
         // headline flies to the top, mascot leaves, the strip pans the first photo in; after
         // that each step is a plain pan of one photo
-        ...photoTimes.map((t, i) => ({ t, seconds: i === 0 ? 1.8 : 1.2 })),
+        ...photoTimes.map((t, i) => ({ t, seconds: i === 0 ? 1.5 : 0.9 })),
       ],
     });
 
