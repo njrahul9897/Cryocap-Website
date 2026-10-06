@@ -258,9 +258,11 @@ export default function StageScroll() {
 
       tl.to({}, { duration: 0.2 }, TOTAL - 0.2);
 
-      // Resting points for phone swipe stepping (swipe-steps.ts): the hero, each problem pair
-      // in the middle of its hold, the Cryocap cap back on the can, then the cards a screenful
-      // at a time.
+      // Resting points for phone swipe stepping (swipe-steps.ts): the hero; the Cryocap cap off
+      // with the can upright (step 1 done); the generic cap seated (step 2 done, at 2.5 exactly:
+      // the PROBLEMS sweep starts flush with the right edge then, so any later shows its "P"); the can tilted back with the PROBLEMS sweep fully across (step 3);
+      // each problem pair in the middle of its hold; the Cryocap cap back on the can; then the
+      // cards a screenful at a time.
       const cardsFrom = stage.offsetHeight * 1.1;
       const cardsTo = -solutionsCards.offsetHeight;
       const cardsAt = dismissCAt + 4.5;
@@ -286,7 +288,7 @@ export default function StageScroll() {
       }
       // a pair is fully in 0.6 after its reveal starts; rest midway between that and its dismiss
       const pairRest = (at: number) => at + (0.6 + PAIR_HOLD) / 2;
-      const restTimes = [0, pairRest(aAt), pairRest(bAt), pairRest(cAt), dismissCAt + 3.0, ...pageTimes];
+      const restTimes = [0, 1.85, 2.5, 4.1, pairRest(aAt), pairRest(bAt), pairRest(cAt), dismissCAt + 3.0, ...pageTimes];
       const st = tl.scrollTrigger!;
       const removeRest = addRestPoints(() => timesToScroll(st, tl.duration(), restTimes));
 
