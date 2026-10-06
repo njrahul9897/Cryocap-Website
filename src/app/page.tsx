@@ -3,7 +3,6 @@ import HowItWorks from "@/components/sections/HowItWorks";
 import WhereUsed from "@/components/sections/WhereUsed";
 import Footer from "@/components/sections/Footer";
 import IntroReveal from "@/components/IntroReveal";
-import GapSpeed from "@/components/GapSpeed";
 
 export default function Home() {
   return (
@@ -13,7 +12,6 @@ export default function Home() {
       <HowItWorks />
       <WhereUsed />
       <Footer />
-      <GapSpeed />
     </main>
   );
 }

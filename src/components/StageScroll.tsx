@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { useViewportKey } from "@/lib/use-viewport-key";
+import { addRestPoints, timesToScroll } from "@/lib/rest-points";
 
 export const INTRO_DONE_EVENT = "cryocap:intro-done";
 
@@ -257,7 +258,40 @@ export default function StageScroll() {
 
       tl.to({}, { duration: 0.2 }, TOTAL - 0.2);
 
+      // Resting points for phone swipe stepping (swipe-steps.ts): the hero, each problem pair
+      // in the middle of its hold, the Cryocap cap back on the can, then the cards a screenful
+      // at a time.
+      const cardsFrom = stage.offsetHeight * 1.1;
+      const cardsTo = -solutionsCards.offsetHeight;
+      const cardsAt = dismissCAt + 4.5;
+      // Column translate -> timeline time, inverting the linear card tween above.
+      const cardTime = (y: number) => cardsAt + (CARD_SCROLL * (y - cardsFrom)) / (cardsTo - cardsFrom);
+      // Clear of the header above and the bottom bar below.
+      const bandTop = 0.1 * vh;
+      const bandBottom = 0.9 * vh;
+      const pageTimes: number[] = [];
+      for (let i = 0; i < solutionCards.length; ) {
+        const top = solutionCards[i].offsetTop;
+        let j = i;
+        while (
+          j + 1 < solutionCards.length &&
+          solutionCards[j + 1].offsetTop + solutionCards[j + 1].offsetHeight - top <= bandBottom - bandTop
+        ) {
+          j++;
+        }
+        const bottom = solutionCards[j].offsetTop + solutionCards[j].offsetHeight;
+        // centre the page of cards in the band
+        pageTimes.push(cardTime((bandTop + bandBottom) / 2 - (top + bottom) / 2));
+        i = j + 1;
+      }
+      // a pair is fully in 0.6 after its reveal starts; rest midway between that and its dismiss
+      const pairRest = (at: number) => at + (0.6 + PAIR_HOLD) / 2;
+      const restTimes = [0, pairRest(aAt), pairRest(bAt), pairRest(cAt), dismissCAt + 3.0, ...pageTimes];
+      const st = tl.scrollTrigger!;
+      const removeRest = addRestPoints(() => timesToScroll(st, tl.duration(), restTimes));
+
       ScrollTrigger.refresh();
+      return removeRest;
     },
     { dependencies: [ready, viewport], revertOnUpdate: true },
   );

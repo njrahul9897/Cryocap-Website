@@ -5,12 +5,13 @@ import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { setLenis } from "@/lib/lenis-store";
+import { swipeSteps } from "@/lib/swipe-steps";
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const lenis = new Lenis({
+    const lenis: Lenis = new Lenis({
       lerp: 0.1,
       smoothWheel: true,
       // Touch has to be lerped here, not left native. Almost every section on this page is a
@@ -39,6 +40,10 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       touchMultiplier: 1,
       syncTouchLerp: 0.09,
       anchors: true,
+      // On a phone, a released swipe glides to the next resting point instead of coasting on
+      // the inertia above — see swipe-steps.ts. The getter reads `lenis` lazily: the hook only
+      // ever runs on an input event, long after the assignment below has happened.
+      virtualScroll: swipeSteps((): Lenis => lenis),
     });
 
     lenis.on("scroll", ScrollTrigger.update);
