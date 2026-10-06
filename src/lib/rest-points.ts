@@ -6,15 +6,18 @@ import type { ScrollTrigger } from "@/lib/gsap";
  * scrubbed timeline and the TIMELINE times it rests at, because that is the unit its
  * choreography is written in.
  *
- * They are resolved to scroll pixels only when asked for, through the trigger's live start/end,
- * so a ScrollTrigger refresh (resize, late image, the intro unlocking the page) never leaves a
- * stale position behind.
+ * Every stop also carries how long the glide INTO it takes (from the stop before it, which may
+ * belong to the previous section). That is set per step, by eye, from what the step shows — no
+ * formula held up: timeline beats overcount a card scroll and undercount the photo pan, and
+ * pixels say nothing about how much is animating. Going back up a step takes the same time.
  *
- * The timeline also tells the stepper how much is HAPPENING between two points, which is what
- * the glide is timed by: pixels are no measure of that, since the sections map a beat of
- * animation onto anything from ~260px to ~950px of scroll.
+ * Positions are resolved only when asked for, through the trigger's live start/end, so a
+ * ScrollTrigger refresh (resize, late image, the intro unlocking the page) never leaves a stale
+ * position behind.
  */
-type Section = { st: ScrollTrigger; duration: number; times: number[] };
+export type Stop = { t: number; seconds: number };
+type Section = { st: ScrollTrigger; duration: number; stops: Stop[] };
+export type RestPoint = { y: number; seconds: number };
 
 const sections = new Set<Section>();
 
@@ -25,30 +28,33 @@ export function addRestSection(section: Section): () => void {
   };
 }
 
-const toScroll = ({ st }: Section, t: number, duration: number) =>
-  st.start + Math.min(Math.max(t / duration, 0), 1) * (st.end - st.start);
-
 /** Every registered point, ascending, with near-duplicates (within a few px) merged. */
-export function restPoints(): number[] {
-  const all = [...sections].flatMap((s) => s.times.map((t) => toScroll(s, t, s.duration))).sort((a, b) => a - b);
-  return all.filter((p, i) => i === 0 || p - all[i - 1] > 4);
+export function restPoints(): RestPoint[] {
+  const all = [...sections]
+    .flatMap(({ st, duration, stops }) =>
+      stops.map(({ t, seconds }) => ({
+        y: st.start + Math.min(Math.max(t / duration, 0), 1) * (st.end - st.start),
+        seconds,
+      })),
+    )
+    .sort((a, b) => a.y - b.y);
+  return all.filter((p, i) => i === 0 || p.y - all[i - 1].y > 4);
 }
 
 /**
- * Beats of animation between two scroll positions. Inside a section that is its own timeline's
- * time; scroll no section covers (a full-screen section sliding up into place before it pins)
- * counts as one beat per viewport, since the whole screen is in motion there.
+ * Glide time between two scroll positions: each step it crosses contributes its own duration,
+ * in proportion to how much of that step is left to cover — so a release half way through a
+ * step, after a long drag, only plays the remaining half.
  */
-export function beatsBetween(a: number, b: number, vh: number): number {
-  const lo = Math.min(a, b);
-  const hi = Math.max(a, b);
-  let beats = 0;
-  let covered = 0;
-  for (const { st, duration } of sections) {
-    const overlap = Math.min(hi, st.end) - Math.max(lo, st.start);
-    if (overlap <= 0 || st.end <= st.start) continue;
-    beats += (overlap / (st.end - st.start)) * duration;
-    covered += overlap;
+export function glideSeconds(points: RestPoint[], from: number, to: number): number {
+  const lo = Math.min(from, to);
+  const hi = Math.max(from, to);
+  let seconds = 0;
+  for (let i = 1; i < points.length; i++) {
+    const a = points[i - 1].y;
+    const b = points[i].y;
+    const overlap = Math.min(hi, b) - Math.max(lo, a);
+    if (overlap > 0) seconds += (overlap / (b - a)) * points[i].seconds;
   }
-  return beats + Math.max(0, hi - lo - covered) / vh;
+  return seconds;
 }

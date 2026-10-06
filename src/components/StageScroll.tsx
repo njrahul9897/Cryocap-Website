@@ -261,11 +261,10 @@ export default function StageScroll() {
 
       tl.to({}, { duration: 0.2 }, TOTAL - 0.2);
 
-      // Resting points for phone swipe stepping (swipe-steps.ts): the hero; the Cryocap cap off
-      // with the can upright (step 1 done); the generic cap seated (step 2 done, just before 2.5:
-      // the PROBLEMS sweep starts flush with the right edge then, so any later shows its "P"); the can tilted back with the PROBLEMS sweep fully across (step 3);
-      // each problem pair in the middle of its hold; the Cryocap cap back on the can; then the
-      // cards a screenful at a time.
+      // Resting points for phone swipe stepping (swipe-steps.ts). Problems and solutions follow
+      // the same four-beat shape — cap off, new cap seated, the section's word swept across, then
+      // the content — so each swipe carries one idea. `seconds` is the glide INTO each stop,
+      // sized to what that step animates (see rest-points.ts).
       const cardsFrom = stage.offsetHeight * 1.1;
       const cardsTo = -solutionsCards.offsetHeight;
       const cardsAt = dismissCAt + 4.5;
@@ -291,8 +290,30 @@ export default function StageScroll() {
       }
       // a pair is fully in 0.6 after its reveal starts; rest midway between that and its dismiss
       const pairRest = (at: number) => at + (0.6 + PAIR_HOLD) / 2;
-      const restTimes = [0, 1.85, 2.48, 4.1, pairRest(aAt), pairRest(bAt), pairRest(cAt), dismissCAt + 3.0, ...pageTimes];
-      const removeRest = addRestSection({ st: tl.scrollTrigger!, duration: tl.duration(), times: restTimes });
+      const stops = [
+        { t: 0, seconds: 1.7 }, // hero (the glide back up from the first stop)
+        // Cryocap cap off, can upright
+        { t: 1.85, seconds: 1.7 },
+        // generic cap seated. Before 2.5: the PROBLEMS sweep starts flush with the right edge
+        // then, so any later shows its "P"
+        { t: 2.48, seconds: 0.7 },
+        // can tilted back, PROBLEMS swept fully across
+        { t: 4.1, seconds: 1.5 },
+        { t: pairRest(aAt), seconds: 1.5 },
+        { t: pairRest(bAt), seconds: 1.7 },
+        { t: pairRest(cAt), seconds: 1.7 },
+        // pair C, labels and lines out, generic cap off, can moved into its solutions spot —
+        // the busiest step on the page, hence the longest glide
+        { t: dismissCAt + 1.9, seconds: 2.0 },
+        // Cryocap cap seated again, before the SOLUTIONS sweep starts at +3.2
+        { t: dismissCAt + 3.0, seconds: 0.9 },
+        // SOLUTIONS swept fully across (it ends at +4.8). The cards are already moving by then
+        // but start a margin below the stage, so they are still out of sight here.
+        { t: dismissCAt + 4.85, seconds: 1.5 },
+        // the first page of cards rises a full screen; later pages move about half that
+        ...pageTimes.map((t, i) => ({ t, seconds: i === 0 ? 1.8 : 1.4 })),
+      ];
+      const removeRest = addRestSection({ st: tl.scrollTrigger!, duration: tl.duration(), stops });
 
       ScrollTrigger.refresh();
       return removeRest;

@@ -186,7 +186,12 @@ export default function HowItWorksScroll() {
     const removeRest = addRestSection({
       st: tl.scrollTrigger!,
       duration: tl.duration(),
-      times: [PHASE_2 - 0.05, tl.duration()],
+      stops: [
+        // the stage's cards leave, this section slides up and pins, the headline and cap land
+        { t: PHASE_2 - 0.05, seconds: 2.2 },
+        // headline shrinks, cap leaves, the four steps arrive
+        { t: tl.duration(), seconds: 1.6 },
+      ],
     });
 
     ScrollTrigger.refresh();

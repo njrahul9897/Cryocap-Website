@@ -98,7 +98,7 @@ export default function FooterScroll() {
     const removeRest = addRestSection({
       st: arrive.scrollTrigger!,
       duration: arrive.duration(),
-      times: [arrive.duration()],
+      stops: [{ t: arrive.duration(), seconds: 1.4 }],
     });
 
     ScrollTrigger.refresh();

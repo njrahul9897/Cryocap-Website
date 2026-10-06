@@ -185,7 +185,13 @@ export default function WhereUsedScroll() {
     const removeRest = addRestSection({
       st: tl.scrollTrigger!,
       duration: tl.duration(),
-      times: [PHASE_2 - 0.05, ...photoTimes],
+      stops: [
+        // this section slides up and pins, the headline and mascot land
+        { t: PHASE_2 - 0.05, seconds: 2.0 },
+        // headline flies to the top, mascot leaves, the strip pans the first photo in; after
+        // that each step is a plain pan of one photo
+        ...photoTimes.map((t, i) => ({ t, seconds: i === 0 ? 1.8 : 1.2 })),
+      ],
     });
 
     ScrollTrigger.refresh();

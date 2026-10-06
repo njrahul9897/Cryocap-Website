@@ -1,6 +1,6 @@
 import type Lenis from "lenis";
 import type { VirtualScrollData } from "lenis";
-import { beatsBetween, restPoints } from "@/lib/rest-points";
+import { glideSeconds, restPoints, type RestPoint } from "@/lib/rest-points";
 
 // Phone swipe stepping. While the finger is down nothing changes: Lenis drags the page 1:1, so
 // you can hold, scrub slowly, back up. What changes is the RELEASE. Lenis would throw the page
@@ -24,13 +24,10 @@ const FUMBLE_PX = 30;
 // than carrying on to the next; the short step back is far smaller than skipping content.
 const SETTLE_BACK_VH = 0.12;
 
-// Glide timing follows how much ANIMATION the step covers (timeline beats, see rest-points.ts),
-// not how far it scrolls: the sections spend anywhere from ~260px to ~950px of scroll on a beat,
-// so a pixel-based duration rushed the dense steps (the cap coming off) and dawdled through
-// sparse ones. The pace is the green-cap step's, which read as right: about a second a beat.
-// Clamped so a tiny step still reads as a glide and a section crossing never drags.
-const SECONDS_PER_BEAT = 0.9;
-const glideDuration = (beats: number) => Math.min(2, Math.max(0.7, beats * SECONDS_PER_BEAT));
+// Each step's glide time is set where its stop is registered (see rest-points.ts), from what
+// that step shows. Only a floor here, so a release a few pixels short of a stop still reads as
+// a glide rather than a snap.
+const MIN_GLIDE = 0.5;
 // Even, symmetric ease. A fast-out ease crammed whatever sits at the START of a step into its
 // first instant (the orange cap shot off) while content near the end got the soft landing;
 // this keeps the pace steady wherever in the step the content lies. The scrub's own smoothing
@@ -94,14 +91,16 @@ export function swipeSteps(getLenis: () => Lenis | null) {
     dragged = false;
 
     const vh = window.innerHeight;
-    const target = pickTarget(start, lenis.targetScroll, restPoints(), vh);
+    const points: RestPoint[] = restPoints();
+    const now = lenis.targetScroll;
+    const target = pickTarget(start, now, points.map((p) => p.y), vh);
     if (target === null) return true;
 
     // Returning false skips Lenis's touchend handling entirely, including the line that would
     // clear this flag.
     lenis.isTouching = false;
     lenis.scrollTo(target, {
-      duration: glideDuration(beatsBetween(lenis.targetScroll, target, vh)),
+      duration: Math.max(MIN_GLIDE, glideSeconds(points, now, target)),
       easing: easeInOutSine,
     });
     return false;
