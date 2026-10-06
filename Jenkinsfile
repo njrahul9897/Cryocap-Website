@@ -14,7 +14,7 @@ pipeline {
     stages {
         stage("SCM CHECKOUT") {
             steps {
-             checkout scmGit(branches: [[name: 'cryocap-website']], extensions: [], userRemoteConfigs: [[credentialsId: 'Gitea Token', url: 'https://git.aone.ai/atsuya/cryocap-website.git']])
+             checkout scmGit(branches: [[name: 'main']], extensions: [], userRemoteConfigs: [[credentialsId: 'Gitea Token', url: 'https://git.aone.ai/atsuya/cryocap-website.git']])
             }
        }
         stage("DOCKER IMAGE BUILD") {
@@ -108,7 +108,3 @@ pipeline {
         }
     }
 }
-
-
-
-
