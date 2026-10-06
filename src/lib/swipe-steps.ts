@@ -1,6 +1,6 @@
 import type Lenis from "lenis";
 import type { VirtualScrollData } from "lenis";
-import { restPoints } from "@/lib/rest-points";
+import { beatsBetween, restPoints } from "@/lib/rest-points";
 
 // Phone swipe stepping. While the finger is down nothing changes: Lenis drags the page 1:1, so
 // you can hold, scrub slowly, back up. What changes is the RELEASE. Lenis would throw the page
@@ -24,11 +24,18 @@ const FUMBLE_PX = 30;
 // than carrying on to the next; the short step back is far smaller than skipping content.
 const SETTLE_BACK_VH = 0.12;
 
-// Glide timing grows with distance (a step inside a section is ~1/2 viewport; crossing to the
-// next section is a couple of viewports) but is clamped so a long crossing never drags.
-const glideDuration = (distance: number, vh: number) => Math.min(1.5, Math.max(0.6, 0.5 + (0.45 * distance) / vh));
-// Fast out of the gate to carry on the finger's speed, long soft landing.
-const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+// Glide timing follows how much ANIMATION the step covers (timeline beats, see rest-points.ts),
+// not how far it scrolls: the sections spend anywhere from ~260px to ~950px of scroll on a beat,
+// so a pixel-based duration rushed the dense steps (the cap coming off) and dawdled through
+// sparse ones. The pace is the green-cap step's, which read as right: about a second a beat.
+// Clamped so a tiny step still reads as a glide and a section crossing never drags.
+const SECONDS_PER_BEAT = 0.9;
+const glideDuration = (beats: number) => Math.min(2, Math.max(0.7, beats * SECONDS_PER_BEAT));
+// Even, symmetric ease. A fast-out ease crammed whatever sits at the START of a step into its
+// first instant (the orange cap shot off) while content near the end got the soft landing;
+// this keeps the pace steady wherever in the step the content lies. The scrub's own smoothing
+// absorbs the gentle start, so it still flows on from the finger.
+const easeInOutSine = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
 
 function enabled() {
   return window.innerWidth < MOBILE_MAX && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -94,8 +101,8 @@ export function swipeSteps(getLenis: () => Lenis | null) {
     // clear this flag.
     lenis.isTouching = false;
     lenis.scrollTo(target, {
-      duration: glideDuration(Math.abs(target - lenis.targetScroll), vh),
-      easing: easeOutCubic,
+      duration: glideDuration(beatsBetween(lenis.targetScroll, target, vh)),
+      easing: easeInOutSine,
     });
     return false;
   };

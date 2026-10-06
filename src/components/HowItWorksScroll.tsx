@@ -1,7 +1,7 @@
 "use client";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { addRestPoints, timesToScroll } from "@/lib/rest-points";
+import { addRestSection } from "@/lib/rest-points";
 import { useViewportKey } from "@/lib/use-viewport-key";
 import { largeViewportHeight } from "@/lib/viewport";
 
@@ -183,8 +183,11 @@ export default function HowItWorksScroll() {
 
     // Phone swipe resting points: headline + cap landed (just before phase 2), then all four
     // steps in.
-    const st = tl.scrollTrigger!;
-    const removeRest = addRestPoints(() => timesToScroll(st, tl.duration(), [PHASE_2 - 0.05, tl.duration()]));
+    const removeRest = addRestSection({
+      st: tl.scrollTrigger!,
+      duration: tl.duration(),
+      times: [PHASE_2 - 0.05, tl.duration()],
+    });
 
     ScrollTrigger.refresh();
     return removeRest;

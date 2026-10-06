@@ -1,7 +1,7 @@
 "use client";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { addRestPoints } from "@/lib/rest-points";
+import { addRestSection } from "@/lib/rest-points";
 import { useViewportKey } from "@/lib/use-viewport-key";
 
 // Two separate behaviours, because Figma frames 18 -> 19 are two different moments:
@@ -95,8 +95,11 @@ export default function FooterScroll() {
     }
 
     // Phone swipe resting point: the footer fully arrived.
-    const arriveSt = arrive.scrollTrigger!;
-    const removeRest = addRestPoints(() => [arriveSt.end]);
+    const removeRest = addRestSection({
+      st: arrive.scrollTrigger!,
+      duration: arrive.duration(),
+      times: [arrive.duration()],
+    });
 
     ScrollTrigger.refresh();
     return removeRest;

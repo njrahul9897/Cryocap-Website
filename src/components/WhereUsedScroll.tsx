@@ -1,7 +1,7 @@
 "use client";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
-import { addRestPoints, timesToScroll } from "@/lib/rest-points";
+import { addRestSection } from "@/lib/rest-points";
 import { useViewportKey } from "@/lib/use-viewport-key";
 import { largeViewportHeight } from "@/lib/viewport";
 
@@ -182,8 +182,11 @@ export default function WhereUsedScroll() {
       )
       .filter((travel) => travel >= 0 && travel <= stripTravel + 1)
       .map((travel) => PHASE_3 + (STRIP_DUR * travel) / stripTravel);
-    const st = tl.scrollTrigger!;
-    const removeRest = addRestPoints(() => timesToScroll(st, tl.duration(), [PHASE_2 - 0.05, ...photoTimes]));
+    const removeRest = addRestSection({
+      st: tl.scrollTrigger!,
+      duration: tl.duration(),
+      times: [PHASE_2 - 0.05, ...photoTimes],
+    });
 
     ScrollTrigger.refresh();
     return removeRest;

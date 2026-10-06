@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 import { useViewportKey } from "@/lib/use-viewport-key";
-import { addRestPoints, timesToScroll } from "@/lib/rest-points";
+import { addRestSection } from "@/lib/rest-points";
 
 export const INTRO_DONE_EVENT = "cryocap:intro-done";
 
@@ -176,10 +176,13 @@ export default function StageScroll() {
       tl.to(product, { rotation: -15, scale: desktop ? 1 : 0.95, y: heroLift, duration: 0.8 }, 1.0);
 
       // 2. generic cap drops in. The wrapper is counter-rotated to -15deg here (can upright),
-      // so unwinding the tilted offset reads as a straight drop onto the neck.
-      tl.to(generic, { x: 0, y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.in" }, 2.0);
-      // shadow lands with the cap: it is only there once the cap touches down at 2.5
-      tl.to(genericShadow, { autoAlpha: 1, duration: 0.25 }, 2.3);
+      // so unwinding the tilted offset reads as a straight drop onto the neck. It lands at 2.45,
+      // a beat-sliver before the tilt-back and sweep at 2.5, so the phone's swipe stop between
+      // the two (2.48) finds it fully seated: `power2.in` is at full speed on touchdown, so a
+      // stop even a pixel of scroll short of the landing left a visible gap under the cap.
+      tl.to(generic, { x: 0, y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.in" }, 1.95);
+      // shadow lands with the cap: it is only there once the cap touches down at 2.45
+      tl.to(genericShadow, { autoAlpha: 1, duration: 0.25 }, 2.25);
 
       // 3. can tilts back and grows while PROBLEMS sweeps across behind it
       tl.to(product, { rotation: 0, scale: desktop ? 1.236 : 1.05, duration: 0.6 }, 2.5);
@@ -259,7 +262,7 @@ export default function StageScroll() {
       tl.to({}, { duration: 0.2 }, TOTAL - 0.2);
 
       // Resting points for phone swipe stepping (swipe-steps.ts): the hero; the Cryocap cap off
-      // with the can upright (step 1 done); the generic cap seated (step 2 done, at 2.5 exactly:
+      // with the can upright (step 1 done); the generic cap seated (step 2 done, just before 2.5:
       // the PROBLEMS sweep starts flush with the right edge then, so any later shows its "P"); the can tilted back with the PROBLEMS sweep fully across (step 3);
       // each problem pair in the middle of its hold; the Cryocap cap back on the can; then the
       // cards a screenful at a time.
@@ -288,9 +291,8 @@ export default function StageScroll() {
       }
       // a pair is fully in 0.6 after its reveal starts; rest midway between that and its dismiss
       const pairRest = (at: number) => at + (0.6 + PAIR_HOLD) / 2;
-      const restTimes = [0, 1.85, 2.5, 4.1, pairRest(aAt), pairRest(bAt), pairRest(cAt), dismissCAt + 3.0, ...pageTimes];
-      const st = tl.scrollTrigger!;
-      const removeRest = addRestPoints(() => timesToScroll(st, tl.duration(), restTimes));
+      const restTimes = [0, 1.85, 2.48, 4.1, pairRest(aAt), pairRest(bAt), pairRest(cAt), dismissCAt + 3.0, ...pageTimes];
+      const removeRest = addRestSection({ st: tl.scrollTrigger!, duration: tl.duration(), times: restTimes });
 
       ScrollTrigger.refresh();
       return removeRest;
