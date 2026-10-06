@@ -5,7 +5,9 @@ import Image from "next/image";
 // counter-rotated by the scroll timeline when the can needs to stand upright.
 export default function Product({ className = "", ...rest }: { className?: string } & Record<`data-${string}`, string>) {
   return (
-    <div className={`relative aspect-[435/651] ${className}`} data-product {...rest}>
+    // pointer-events-none: purely visual, and its cast shadow spans ~2x the can's box, which
+    // sat over the hero's Book a demo button (z-30 over the CTA row's z-20) and swallowed clicks.
+    <div className={`pointer-events-none relative aspect-[435/651] ${className}`} data-product {...rest}>
       <div className="absolute top-[-40.75%] left-[-53.9%] h-[179.2%] w-[205.2%]" data-product-cast-shadow>
         <Image src="/product/can-shadow.svg" alt="" fill sizes="50vw" className="object-fill" unoptimized />
       </div>
