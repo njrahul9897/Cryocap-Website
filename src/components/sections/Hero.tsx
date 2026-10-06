@@ -1,4 +1,4 @@
-import Button from "@/components/ui/Button";
+import ContactButton from "@/components/ContactButton";
 import Product from "@/components/Product";
 import Callout from "@/components/Callout";
 import StageScroll from "@/components/StageScroll";
@@ -133,12 +133,10 @@ export default function Hero() {
             Don’t open the can. Open the app.
           </p>
           <div className="flex w-full justify-center gap-3 sm:w-auto sm:gap-4">
-            <Button variant="outline" icon="/icons/play.svg" className="w-[calc(50%-0.375rem)] max-w-[168px] sm:w-[clamp(130px,8.75vw,168px)]">
-              How it works
-            </Button>
-            <Button href="/buy" icon="/icons/cart.svg" className="w-[calc(50%-0.375rem)] max-w-[168px] sm:w-[clamp(130px,8.75vw,168px)]">
+            {/* "How it works" is hidden for now; Book a demo opens the contact form */}
+            <ContactButton variant="solid" icon="/icons/cart.svg" className="w-[calc(50%-0.375rem)] max-w-[168px] sm:w-[clamp(130px,8.75vw,168px)]">
               Book a demo
-            </Button>
+            </ContactButton>
           </div>
         </div>
       </div>

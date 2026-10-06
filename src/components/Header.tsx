@@ -6,8 +6,6 @@ import { usePathname } from "next/navigation";
 import { getLenis } from "@/lib/lenis-store";
 import { useContactModal } from "@/components/ContactModal";
 
-const dots = Array.from({ length: 9 });
-
 export default function Header() {
   const pathname = usePathname();
   const { openContactModal } = useContactModal();
@@ -43,16 +41,6 @@ export default function Header() {
             <Image src="/icons/phone.svg" alt="" fill sizes="26px" />
           </span>
           <span className="hidden sm:inline">Contact Us</span>
-        </button>
-
-        <button
-          type="button"
-          aria-label="Open menu"
-          className="grid grid-cols-3 gap-[clamp(3px,0.208vw,4px)] p-1 transition-opacity hover:opacity-60"
-        >
-          {dots.map((_, i) => (
-            <span key={i} className="size-[clamp(4px,0.3125vw,6px)] rounded-full bg-ink" />
-          ))}
         </button>
       </div>
     </header>

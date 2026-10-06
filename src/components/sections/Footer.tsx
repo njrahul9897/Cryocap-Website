@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Button from "@/components/ui/Button";
 import ContactButton from "@/components/ContactButton";
 import FooterScroll from "@/components/FooterScroll";
 
@@ -118,9 +117,9 @@ export default function Footer() {
         </p>
         <div className="flex gap-4">
           <ContactButton className="w-[clamp(130px,8.75vw,168px)]" />
-          <Button href="/buy" icon="/icons/cart.svg" className="w-[clamp(130px,8.75vw,168px)]">
+          <ContactButton variant="solid" icon="/icons/cart.svg" className="w-[clamp(130px,8.75vw,168px)]">
             Book a demo
-          </Button>
+          </ContactButton>
         </div>
 
         {/* Patented badge. It lives inside this block, not beside it, so `top-1/2` centres it on
