@@ -48,7 +48,7 @@ pipeline {
                 GIT_USER_NAME = "atsuya"
             }
             steps {
-                dir('igotit-service') {
+                dir('igotit-services') {
                  //   withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')])
                     withCredentials([string(credentialsId: 'argocd', variable: 'argocd')]){
                         sh '''
