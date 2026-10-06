@@ -142,8 +142,14 @@ export default function StageScroll() {
           // this pin is built late (it waits for the intro reveal) but sits first on the page,
           // so it has to refresh before the sections below or their start/end land wrong
           refreshPriority: 1,
-          onUpdate: cardZoom,
         },
+        // On the TIMELINE, not the ScrollTrigger. The trigger's onUpdate only fires when the
+        // scroll position changes, but `scrub: 1` keeps the cards gliding for up to a second
+        // after that stops — so the zoom froze mid-glide (measured: cards still travelling
+        // ~95px with the scale stuck) and then snapped on the next swipe, which on a phone is
+        // the stutter that made the cards hard to read. The timeline updates on every frame
+        // the cards actually move.
+        onUpdate: cardZoom,
       });
 
       // On mobile the hero parks the can above centre, to tighten the space under the tagline.
