@@ -19,6 +19,29 @@ export function useContactModal() {
 
 type Phase = "form" | "success";
 
+// Zoho CRM Web-to-Lead, wired straight into this form (no Zoho markup or styling on the page).
+// The values below are copied verbatim from the web form Zoho generated for "Cryocap Website".
+// They are public form identifiers that ship in Zoho's own embed code, not API keys or secrets.
+const ZOHO = {
+  action: "https://crm.zoho.in/crm/WebToLeadForm",
+  // the hidden iframe the form posts into, so the visitor stays on the page
+  target: "zoho-web-to-lead",
+  hidden: {
+    xnQsjsdp: "935571d313e3816b0a1671c7b6278cef652a92aefa133429686c30aaab5c831d",
+    zc_gad: "",
+    xmIwtLD: "6de8a45e95e8a54b02029ccbf6d2403efb66022598aa89a049f437da38c20f4599f7df8a4ae8364db255d99677f2eea8",
+    actionType: "TGVhZHM=",
+    returnURL: "null",
+  },
+  // Zoho's spam honeypot: a text field hidden from people, so only a bot fills it in
+  honeypot: "aG9uZXlwb3Q",
+};
+// Zoho requires Company, but Organisation is optional here.
+const COMPANY_FALLBACK = "Not provided";
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// 10 digits, optionally prefixed +91. Spaces and dashes people type are ignored.
+const PHONE_RE = /^(\+91)?\d{10}$/;
+
 export function ContactModalProvider({ children }: { children: React.ReactNode }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -26,6 +49,11 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
   // focus there instead of dropping it back to the top of the page.
   const triggerRef = useRef<HTMLElement | null>(null);
   const [phase, setPhase] = useState<Phase>("form");
+  // Set from the first valid submit until the popup closes: disables Submit so a double click
+  // cannot create two leads, and tells the iframe's load event that it is Zoho's response
+  // rather than the frame's own initial about:blank load.
+  const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   const openContactModal = () => {
     triggerRef.current = document.activeElement as HTMLElement | null;
@@ -34,7 +62,10 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
     // Focusing the first field is a keyboard convenience, so it is for pointers that have a
     // keyboard beside them. On a phone it throws up the on-screen keyboard over the form, and
     // on iOS it also zooms the page in on the field before the form has even been read.
-    if (window.matchMedia("(pointer: fine)").matches) formRef.current?.querySelector("input")?.focus();
+    // Named, not "the first input": Zoho's hidden fields now come first in the form.
+    if (window.matchMedia("(pointer: fine)").matches) {
+      formRef.current?.querySelector<HTMLInputElement>('input[name="Last Name"]')?.focus();
+    }
     // showModal() does NOT stop the page scrolling on its own — this site's wheel events are
     // driven by Lenis, which has no idea a native <dialog> just grabbed focus and keeps
     // smooth-scrolling the document underneath it. Same stop/start pair IntroReveal uses.
@@ -54,6 +85,8 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
       getLenis()?.start();
       triggerRef.current?.focus?.();
       formRef.current?.reset();
+      submittingRef.current = false;
+      setSubmitting(false);
       setPhase("form");
     };
     dialog.addEventListener("close", onClose);
@@ -67,12 +100,47 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
     if (e.target === dialogRef.current) close();
   };
 
+  // Runs after the browser's own `required` check has passed. Adds the format checks that
+  // `required` cannot express, reported through the same native validation bubble, then lets
+  // the form post natively into the hidden iframe.
   const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    // This is a static export with no backend yet, so there is nowhere to actually send this —
-    // the browser's own `required`/`type` validation is the only check that runs before the
-    // confirmation shows. Wire a real destination (an API route, a mailto, a CRM webhook) here
-    // once one exists.
+    const form = e.currentTarget;
+    if (submittingRef.current) {
+      e.preventDefault();
+      return;
+    }
+    const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
+    const email = field("Email");
+    const phone = field("Phone");
+    email.setCustomValidity(EMAIL_RE.test(email.value.trim()) ? "" : "Please enter a valid email address.");
+    phone.setCustomValidity(
+      PHONE_RE.test(phone.value.replace(/[\s-]/g, "")) ? "" : "Please enter a 10-digit phone number, optionally starting with +91.",
+    );
+    if (!form.checkValidity()) {
+      e.preventDefault();
+      form.reportValidity();
+      return;
+    }
+
+    // Written into the field during the submit event, so it is what gets posted; the form is
+    // swapped for the thank-you message before anyone could see it.
+    const company = field("Company");
+    if (!company.value.trim()) company.value = COMPANY_FALLBACK;
+
+    submittingRef.current = true;
+    setSubmitting(true);
+    // No preventDefault: the native POST goes to Zoho through the iframe. The thank-you waits
+    // for that frame to load (onZohoResponse) — swapping it in now would unmount the form in
+    // the middle of its own submission, and the browser drops a submission whose form has left
+    // the page.
+  };
+
+  // A custom validity message sticks until it is cleared, so clear it as soon as the visitor
+  // edits the field; the next submit re-checks it.
+  const clearValidity = (e: React.FormEvent<HTMLInputElement>) => e.currentTarget.setCustomValidity("");
+
+  const onZohoResponse = () => {
+    if (!submittingRef.current) return;
     setPhase("success");
   };
 
@@ -114,11 +182,35 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
                 Tell us a bit about you and we’ll be in touch.
               </p>
 
-              <form ref={formRef} onSubmit={onSubmit} className="mt-[clamp(18px,1.875vw,32px)] flex flex-col gap-[clamp(14px,1.25vw,20px)]">
-                <Field label="Name" name="name" autoComplete="name" required />
-                <Field label="Email ID" name="email" type="email" autoComplete="email" required />
-                <Field label="Phone Number" name="phone" type="tel" autoComplete="tel" required />
-                <Field label="Organisation" name="organisation" autoComplete="organization" />
+              <form
+                ref={formRef}
+                onSubmit={onSubmit}
+                action={ZOHO.action}
+                method="POST"
+                acceptCharset="UTF-8"
+                target={ZOHO.target}
+                className="mt-[clamp(18px,1.875vw,32px)] flex flex-col gap-[clamp(14px,1.25vw,20px)]"
+              >
+                {/* type="hidden" and display:none both generate no box, so none of these take a
+                    slot in the flex column or its gap. */}
+                {Object.entries(ZOHO.hidden).map(([name, value]) => (
+                  <input key={name} type="hidden" name={name} defaultValue={value} />
+                ))}
+                <input
+                  type="text"
+                  name={ZOHO.honeypot}
+                  defaultValue=""
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  style={{ display: "none" }}
+                />
+
+                {/* Zoho field names: Name is the lead's "Last Name" (its one mandatory field) */}
+                <Field label="Name" name="Last Name" autoComplete="name" maxLength={80} required />
+                <Field label="Email ID" name="Email" type="email" autoComplete="email" maxLength={100} required onInput={clearValidity} />
+                <Field label="Phone Number" name="Phone" type="tel" autoComplete="tel" maxLength={30} required onInput={clearValidity} />
+                <Field label="Organisation" name="Company" autoComplete="organization" maxLength={200} />
                 {/* Button's own py/leading-none make it noticeably shorter than the fields above it
                     (measured 40px against the fields' 52px at this viewport) — an explicit height
                     sidesteps that mismatch directly rather than fighting Button's base padding/
@@ -127,6 +219,8 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
                     everything against (52px), matching both ends exactly. */}
                 <Button
                   type="submit"
+                  disabled={submitting}
+                  aria-busy={submitting}
                   className="mt-[clamp(4px,0.625vw,12px)] h-[clamp(40px,2.708vw,52px)] w-full justify-center"
                 >
                   Submit
@@ -170,14 +264,13 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
                 </svg>
               </span>
               <div className="flex flex-col gap-[clamp(4px,0.417vw,8px)]">
-                {/* Sized to hold this exact sentence on one line inside the panel (measured via
-                    canvas text metrics against the panel's actual inner width) — the original
-                    heading size wrapped it as "...reaching out to / us.", orphaning two words. */}
-                <h2 id="contact-modal-heading" className="text-[clamp(16px,1.2vw,22px)] font-extrabold leading-snug text-ink">
-                  Thank you for reaching out to us.
+                {/* text-balance: this sentence is longer than the one the size was tuned for, and
+                    can wrap on narrow panels; balancing keeps it from orphaning a single word. */}
+                <h2 id="contact-modal-heading" className="text-[clamp(16px,1.2vw,22px)] font-extrabold leading-snug text-balance text-ink">
+                  Thank you for your interest in Cryocap.
                 </h2>
                 <p className="text-[clamp(12px,0.9vw,15px)] font-normal text-muted">
-                  Our team will get back to you shortly.
+                  Our team will reach out to you shortly.
                 </p>
               </div>
               <Button onClick={close} variant="outline" className="mt-[clamp(4px,0.52vw,8px)]">
@@ -186,6 +279,10 @@ export function ContactModalProvider({ children }: { children: React.ReactNode }
             </div>
           )}
         </div>
+
+        {/* Receives Zoho's response so the page itself never navigates. Never shown: a
+            display:none iframe still loads, and its load event is what flips to the thank-you. */}
+        <iframe name={ZOHO.target} title="Zoho form submission" onLoad={onZohoResponse} hidden tabIndex={-1} aria-hidden="true" />
       </dialog>
     </ContactModalContext.Provider>
   );
@@ -225,9 +322,11 @@ type FieldProps = {
   type?: string;
   required?: boolean;
   autoComplete?: string;
+  maxLength?: number;
+  onInput?: React.FormEventHandler<HTMLInputElement>;
 };
 
-function Field({ label, name, type = "text", required, autoComplete }: FieldProps) {
+function Field({ label, name, type = "text", required, autoComplete, maxLength, onInput }: FieldProps) {
   return (
     <label className="flex flex-col gap-[clamp(4px,0.417vw,8px)] text-left">
       <span className="text-[clamp(12px,0.833vw,14px)] font-medium text-ink">
@@ -239,6 +338,8 @@ function Field({ label, name, type = "text", required, autoComplete }: FieldProp
         type={type}
         required={required}
         autoComplete={autoComplete}
+        maxLength={maxLength}
+        onInput={onInput}
         className="rounded-[clamp(10px,0.833vw,14px)] border border-ink/15 bg-white px-[clamp(12px,1.04vw,18px)] py-[clamp(9px,0.78vw,13px)] text-[16px] text-ink outline-none transition-colors focus:border-ink"
       />
     </label>
