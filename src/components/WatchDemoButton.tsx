@@ -50,7 +50,7 @@ export default function WatchDemoButton({ className = "" }: { className?: string
   return (
     <>
       <Button variant="outline" icon="/icons/play.svg" className={className} onClick={show}>
-        Watch a demo
+        Watch Video
       </Button>
 
       {mounted &&
