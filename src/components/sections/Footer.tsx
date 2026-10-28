@@ -172,7 +172,7 @@ export default function Footer() {
         ))}
       </div>
 
-      {/* Figma swaps the global bar's "Scroll Down" cluster for the copyright down here. */}
+      {/* Figma swaps the global bar's badge cluster for the copyright down here. */}
       <div
         data-footer-copy
         className="invisible absolute right-gutter bottom-[2.96dvh] z-40 text-[clamp(12px,0.833vw,16px)] leading-none text-ink opacity-0"

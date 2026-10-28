@@ -57,11 +57,9 @@ export default function FooterScroll() {
     arrive.to(copy, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.08 }, 0.05);
     arrive.to(can, { y: 0, duration: 0.9 }, 0.1);
 
-    // The global bottom bar's right-hand cluster is "Scroll Down" plus a patented badge. Both
-    // are wrong on the last screen — there is nothing below to scroll to, and the footer shows
-    // its own badge up top — so fade that cluster out as the footer arrives. Nothing else about
-    // the shared chrome changes, and it fades back in on the way out.
-    // Two of these now: the phone's centred arrow and the wider "Scroll Down" + badge group.
+    // The global bottom bar's right-hand cluster is the patented badge, which is redundant on the
+    // last screen — the footer shows its own badge up top — so fade it out as the footer arrives.
+    // Nothing else about the shared chrome changes, and it fades back in on the way out.
     const barEnd = Array.from(document.querySelectorAll<HTMLElement>("[data-bottombar-end]"));
     if (barEnd.length) arrive.to(barEnd, { autoAlpha: 0, duration: 0.3 }, 0.2);
 

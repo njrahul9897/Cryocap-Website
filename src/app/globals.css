@@ -76,34 +76,6 @@ html.lenis body {
   );
 }
 
-/* "Scroll Down" chevrons. The asset is a strip of arrows at a fixed pitch, so the flow is
-   built by tiling it and shifting by exactly one tile — that lands on an identical frame,
-   giving a loop with no seam and no empty beat between arrows.
-   The window is rotated 180deg (the asset points up), which also means the strip's local
-   -Y reads as down on screen, so -50% travels the arrows the way they point. */
-.chevron-window {
-  rotate: 180deg;
-  overflow: hidden;
-  /* arrows ease in and out at the edges of the window instead of fading on a timer, so the
-     stream stays unbroken; same 35%/65% envelope the old per-arrow fade used */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
-}
-
-@keyframes chevron-flow {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-50%);
-  }
-}
-
-/* must stay linear: any easing would stall the stream at the loop point */
-.chevron-flow {
-  animation: chevron-flow 1.6s linear infinite;
-}
-
 body {
   height: auto;
 }
@@ -135,48 +107,6 @@ body {
     rgba(0, 0, 0, 0.035) 68%,
     rgba(0, 0, 0, 0.082) 100%
   );
-}
-
-/* "Scroll Down" chevrons. The asset is a strip of arrows at a fixed pitch, so the flow is
-   built by tiling it and shifting by exactly one tile — that lands on an identical frame,
-   giving a loop with no seam and no empty beat between arrows.
-   The window is rotated 180deg (the asset points up), which also means the strip's local
-   -Y reads as down on screen, so -50% travels the arrows the way they point. */
-.chevron-window {
-  rotate: 180deg;
-  overflow: hidden;
-  /* arrows ease in and out at the edges of the window instead of fading on a timer, so the
-     stream stays unbroken; same 35%/65% envelope the old per-arrow fade used */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 65%, transparent 100%);
-}
-
-@keyframes chevron-flow {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-50%);
-  }
-}
-
-/* must stay linear: any easing would stall the stream at the loop point */
-.chevron-flow {
-  animation: chevron-flow 1.6s linear infinite;
-}
-
-@keyframes chevron-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.25;
-  }
-}
-
-.chevron-pulse {
-  animation: chevron-pulse 1.2s ease-in-out infinite;
 }
 
 body {
